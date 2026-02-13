@@ -1,89 +1,69 @@
-<style>
-    :root {
-        --primary: #1F4F98;
-        --navy: #0C2867;
-        --accent: #F4C744;
-        --white: #FFFFFF;
-    }
-    
-    body { 
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-        background-color: var(--primary); 
-        margin: 0; 
-        padding: 20px 0; /* Removed side padding to help centering */
-        color: var(--white);
-        overflow: hidden;
-        /* THE CENTERING FIX */
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        width: 100%;
-    }
-    
-    .app-wrapper {
-        display: flex;
-        gap: 25px;
-        width: 95%; /* Use percentage for responsiveness */
-        max-width: 900px; /* Limits the width for better readability */
-        margin: 0 auto; /* Extra insurance for centering */
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy Consultant App</title>
+    <style>
+        :root {
+            --primary: #1F4F98;
+            --navy: #0C2867;
+            --accent: #F4C744;
+            --white: #FFFFFF;
+        }
+        
+        /* 1. Reset and Centering */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: var(--primary);
+        }
 
-    /* Left Column: Inputs */
-    .input-section {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            color: var(--white);
+            display: flex;
+            justify-content: center; /* Horizontal Center */
+            align-items: flex-start; /* Start from top */
+            overflow: hidden; /* Prevents internal scrolling */
+        }
+        
+        /* 2. Main App Container */
+        .app-wrapper {
+            display: flex;
+            gap: 30px;
+            width: 90%;
+            max-width: 950px;
+            padding-top: 30px;
+            margin: 0 auto;
+        }
 
-    /* Right Column: Preview */
-    .preview-section {
-        flex: 1;
-        background: rgba(255, 255, 255, 0.1); 
-        padding: 20px;
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        display: flex;
-        flex-direction: column;
-        min-height: 280px;
-    }
+        /* 3. Left Column: Inputs */
+        .input-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-    h2 { font-size: 1.3rem; margin: 0 0 5px 0; color: var(--accent); }
-    label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--white); opacity: 0.8; }
-    
-    select, textarea { 
-        width: 100%; 
-        padding: 10px; 
-        border: 1px solid rgba(255, 255, 255, 0.3); 
-        border-radius: 6px; 
-        font-size: 0.9rem; 
-        background: var(--white);
-        color: var(--navy);
-        font-family: inherit;
-    }
+        /* 4. Right Column: Preview */
+        .preview-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1); 
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            min-height: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
 
-    .prompt-header { font-size: 0.7rem; font-weight: bold; color: var(--accent); margin-bottom: 10px; border-bottom: 1px solid rgba(244, 199, 68, 0.3); padding-bottom: 5px; }
-    
-    #output { 
-        font-size: 0.85rem; 
-        line-height: 1.5; 
-        color: var(--white); 
-        white-space: pre-wrap; 
-        flex-grow: 1;
-    }
-
-    .copy-btn { 
-        margin-top: 15px; 
-        background-color: var(--accent); 
-        color: var(--navy); 
-        border: none; 
-        padding: 12px; 
-        font-weight: bold; 
-        border-radius: 6px; 
-        cursor: pointer; 
-        transition: 0.2s;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-    }
-    /* ... (rest of your existing CSS) ... */
-</style>
+        h2 { font-size: 1.5rem; margin: 0 0 10px 0; color: var(--accent); letter-spacing: -0.5px; }
+        label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--white); opacity: 0.8; }
+        
+        select, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid rgba(2
