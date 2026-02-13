@@ -12,111 +12,128 @@
             --white: #FFFFFF;
         }
         
-        /* THE KEY FIX: Allow the body to scroll internally */
+        /* 1. Base Reset */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
+            min-height: 100%;
             background-color: var(--navy);
-            overflow-y: auto; /* Force internal scrollability */
-            overflow-x: hidden;
+            /* Standard scrolling behavior */
+            overflow-x: hidden; 
+            overflow-y: auto;
         }
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             color: var(--white);
+            line-height: 1.5;
         }
         
-        /* Wrapper allows content to stack and scroll */
+        /* 2. Layout Wrapper - Flexbox with better collision control */
         .app-wrapper {
             display: flex;
             flex-direction: row;
-            gap: 20px;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
             width: 95%; 
-            max-width: 950px;
-            padding: 20px;
+            max-width: 1000px;
+            padding: 40px 20px;
             margin: 0 auto; 
             box-sizing: border-box;
         }
 
-        /* Input Section */
+        /* 3. Input Column (Left) */
         .input-section {
             flex: 1;
+            min-width: 300px; /* Prevents squishing on desktop */
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
-        /* Preview Section */
+        /* 4. Preview Column (Right) */
         .preview-section {
             flex: 1;
+            min-width: 320px; /* Prevents overlapping */
             background: rgba(255, 255, 255, 0.08); 
-            padding: 20px;
+            padding: 25px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex;
             flex-direction: column;
-            min-height: 350px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
         }
 
-        h2 { font-size: 1.3rem; margin: 0 0 10px 0; color: var(--accent); }
-        label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--white); opacity: 0.8; }
+        h2 { font-size: 1.6rem; margin: 0 0 5px 0; color: var(--accent); }
+        label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--white); opacity: 0.8; }
         
         select, textarea { 
             width: 100%; 
             padding: 12px; 
+            margin-top: 5px;
             border: 1px solid rgba(255, 255, 255, 0.2); 
             border-radius: 6px; 
             font-size: 0.95rem; 
             background: var(--white);
             color: var(--navy);
             font-family: inherit;
+            box-sizing: border-box;
         }
+
+        textarea { resize: none; }
 
         .prompt-header { 
             font-size: 0.7rem; 
             font-weight: bold; 
             color: var(--accent); 
-            margin-bottom: 12px; 
+            margin-bottom: 15px; 
             border-bottom: 1px solid rgba(244, 199, 68, 0.3); 
             padding-bottom: 8px; 
+            text-transform: uppercase;
         }
         
+        /* THE TEXT OUTPUT AREA */
         #output { 
-            font-size: 0.85rem; 
+            font-size: 0.9rem; 
             line-height: 1.6; 
             color: var(--white); 
             white-space: pre-wrap; 
-            flex-grow: 1;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            min-height: 200px; /* Ensures the box doesn't collapse */
         }
 
         .copy-btn { 
             background-color: var(--accent); 
             color: var(--navy); 
             border: none; 
-            padding: 14px; 
+            padding: 15px; 
             font-weight: 800; 
-            border-radius: 6px; 
+            border-radius: 8px; 
             cursor: pointer; 
             transition: 0.3s; 
             font-size: 0.85rem; 
             text-transform: uppercase;
             width: 100%;
         }
-        .copy-btn:hover { background-color: #FFFFFF; }
+        .copy-btn:hover { background-color: #FFFFFF; transform: translateY(-2px); }
 
         #tempCopyArea { position: absolute; left: -9999px; top: 0; }
 
-        /* MOBILE FIX: Vertical Stack */
-        @media (max-width: 768px) {
+        /* 5. MOBILE RESPONSIVENESS */
+        @media (max-width: 800px) {
             .app-wrapper { 
                 flex-direction: column; 
+                padding: 20px 10px;
+            }
+            .input-section, .preview-section {
+                width: 100%;
+                min-width: 0;
             }
             .preview-section {
-                min-height: 300px;
-                margin-bottom: 40px; /* Space for the bottom of the iframe */
+                margin-top: 10px;
             }
         }
     </style>
@@ -126,6 +143,7 @@
 <div class="app-wrapper">
     <div class="input-section">
         <h2>Strategic Consultant</h2>
+        
         <div>
             <label>Strategic Objective</label>
             <select id="objective" oninput="generatePrompt()">
@@ -135,10 +153,12 @@
                 <option value="Product-Market Fit Review">Product-Market Fit Review</option>
             </select>
         </div>
+
         <div>
             <label>Context / Challenge</label>
-            <textarea id="context" rows="5" placeholder="Outline the current situation..." oninput="generatePrompt()"></textarea>
+            <textarea id="context" rows="6" placeholder="Outline the current situation..." oninput="generatePrompt()"></textarea>
         </div>
+
         <div>
             <label>Framework</label>
             <select id="framework" oninput="generatePrompt()">
@@ -151,7 +171,7 @@
     </div>
 
     <div class="preview-section">
-        <div class="prompt-header">Generated Prompt</div>
+        <div class="prompt-header">Generated Executive Prompt</div>
         <div id="output">Your strategic prompt will appear here...</div>
         <button class="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
     </div>
@@ -164,13 +184,16 @@
         const obj = document.getElementById('objective').value;
         const ctx = document.getElementById('context').value || "[Context]";
         const frm = document.getElementById('framework').value;
+
         const fullPrompt = `Act as a Senior Managing Partner at a top-tier global strategy consultancy. \n\nCONTEXT: ${ctx}\n\nTASK: Provide a high-level ${obj} using the ${frm}.\n\nCONSTRAINTS: \n- Use a Candid & Executive tone.\n- Prioritize EBITDA impact.\n- Structure for a Board audience.`;
+
         document.getElementById('output').innerText = fullPrompt;
     }
 
     function copyPrompt() {
         const text = document.getElementById('output').innerText;
         const btn = document.querySelector('.copy-btn');
+        
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text).then(() => showSuccess(btn)).catch(() => fallbackCopy(text, btn));
         } else {
@@ -195,7 +218,9 @@
             btn.style.backgroundColor = "var(--accent)";
         }, 2000);
     }
+
     window.onload = generatePrompt;
 </script>
+
 </body>
 </html>
