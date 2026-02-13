@@ -7,7 +7,7 @@
     <style>
         :root {
             --primary: #1F4F98;
-            --navy: #0C2867; /* YOUR NEW PRIMARY BACKGROUND */
+            --navy: #0C2867;
             --accent: #F4C744;
             --white: #FFFFFF;
         }
@@ -17,14 +17,13 @@
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
-            background-color: var(--navy); /* Updated to Deep Navy */
+            min-height: 100%;
+            background-color: var(--navy);
         }
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             color: var(--white);
-            overflow: hidden; 
             display: block;
         }
         
@@ -49,7 +48,7 @@
 
         .preview-section {
             flex: 1;
-            background: rgba(255, 255, 255, 0.08); /* Slightly lighter for contrast on navy */
+            background: rgba(255, 255, 255, 0.08); 
             padding: 25px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -108,16 +107,26 @@
         }
         .copy-btn:hover { background-color: #FFFFFF; }
 
-        /* Hidden textarea for the fallback copy method */
         #tempCopyArea {
             position: absolute;
             left: -9999px;
             top: 0;
         }
 
+        /* MOBILE FIX: Stack and allow height to grow */
         @media (max-width: 768px) {
-            .app-wrapper { flex-direction: column; width: 100%; height: auto; padding: 10px; }
-            body { overflow-y: auto; display: block; }
+            .app-wrapper { 
+                flex-direction: column; 
+                width: 100%; 
+                height: auto; 
+                padding: 15px; 
+            }
+            body { 
+                overflow-y: auto; /* Allow scrolling within the iframe on mobile */
+            }
+            .preview-section {
+                min-height: auto; /* Allow it to shrink or grow based on text */
+            }
         }
     </style>
 </head>
