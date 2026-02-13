@@ -12,121 +12,122 @@
             --white: #FFFFFF;
         }
         
-        /* Reset */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
-            min-height: 100%;
+            height: 100%;
             background-color: var(--navy);
+            overflow: hidden; /* Prevent the whole app from scrolling */
         }
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             color: var(--white);
-            display: block;
         }
         
-        /* Main App Container */
         .app-wrapper {
             display: flex;
-            gap: 30px;
-            width: 98%; 
+            gap: 20px;
+            width: 95%; 
             max-width: 950px;
             padding: 20px;
             margin: 0; 
             box-sizing: border-box;
+            height: 100vh; /* Fill the iframe height */
         }
 
-        /* Columns */
+        /* Left Column */
         .input-section {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            overflow-y: auto; /* Allow inputs to scroll if screen is tiny */
+            padding-right: 10px;
         }
 
+        /* Right Column (The Prompt Box) */
         .preview-section {
-            flex: 1;
+            flex: 1.2;
             background: rgba(255, 255, 255, 0.08); 
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex;
             flex-direction: column;
-            min-height: 320px;
+            height: 90%; /* Fixed height relative to iframe */
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
 
-        h2 { font-size: 1.4rem; margin: 0 0 10px 0; color: var(--accent); }
-        label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--white); opacity: 0.8; }
+        h2 { font-size: 1.3rem; margin: 0 0 5px 0; color: var(--accent); }
+        label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--white); opacity: 0.8; }
         
         select, textarea { 
             width: 100%; 
-            padding: 12px; 
+            padding: 10px; 
             border: 1px solid rgba(255, 255, 255, 0.2); 
             border-radius: 6px; 
-            font-size: 0.95rem; 
+            font-size: 0.9rem; 
             background: var(--white);
             color: var(--navy);
             font-family: inherit;
         }
 
-        textarea { resize: none; }
-
         .prompt-header { 
-            font-size: 0.75rem; 
+            font-size: 0.7rem; 
             font-weight: bold; 
             color: var(--accent); 
-            margin-bottom: 12px; 
+            margin-bottom: 10px; 
             border-bottom: 1px solid rgba(244, 199, 68, 0.3); 
-            padding-bottom: 8px; 
-            text-transform: uppercase;
+            padding-bottom: 5px; 
         }
         
+        /* THE CRITICAL FIX: The output area is now scrollable */
         #output { 
             font-size: 0.85rem; 
-            line-height: 1.6; 
+            line-height: 1.5; 
             color: var(--white); 
             white-space: pre-wrap; 
-            flex-grow: 1; 
+            flex-grow: 1;
+            overflow-y: auto; /* Scroll text if it exceeds the box height */
+            padding-right: 10px;
+            margin-bottom: 10px;
         }
 
+        /* Custom Scrollbar for the output */
+        #output::-webkit-scrollbar { width: 6px; }
+        #output::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
         .copy-btn { 
-            margin-top: 20px; 
             background-color: var(--accent); 
             color: var(--navy); 
             border: none; 
-            padding: 14px; 
+            padding: 12px; 
             font-weight: 800; 
             border-radius: 6px; 
             cursor: pointer; 
             transition: 0.3s; 
-            font-size: 0.85rem; 
+            font-size: 0.8rem; 
             text-transform: uppercase;
+            width: 100%;
         }
         .copy-btn:hover { background-color: #FFFFFF; }
 
-        #tempCopyArea {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-        }
+        #tempCopyArea { position: absolute; left: -9999px; top: 0; }
 
-        /* MOBILE FIX: Stack and allow height to grow */
+        /* MOBILE FIX: Vertical Stack but keep output box scrollable */
         @media (max-width: 768px) {
             .app-wrapper { 
                 flex-direction: column; 
-                width: 100%; 
                 height: auto; 
-                padding: 15px; 
-            }
-            body { 
-                overflow-y: auto; /* Allow scrolling within the iframe on mobile */
+                overflow-y: visible;
             }
             .preview-section {
-                min-height: auto; /* Allow it to shrink or grow based on text */
+                height: 350px; /* Force a fixed height on mobile so it doesn't get cut */
+                margin-top: 10px;
             }
+            html, body { overflow: visible; } /* Allow Thinkific to handle the main scroll */
         }
     </style>
 </head>
@@ -135,7 +136,6 @@
 <div class="app-wrapper">
     <div class="input-section">
         <h2>Strategic Consultant</h2>
-        
         <div>
             <label>Strategic Objective</label>
             <select id="objective" oninput="generatePrompt()">
@@ -145,12 +145,10 @@
                 <option value="Product-Market Fit Review">Product-Market Fit Review</option>
             </select>
         </div>
-
         <div>
             <label>Context / Challenge</label>
-            <textarea id="context" rows="5" placeholder="Outline the current situation..." oninput="generatePrompt()"></textarea>
+            <textarea id="context" rows="4" placeholder="Outline the current situation..." oninput="generatePrompt()"></textarea>
         </div>
-
         <div>
             <label>Framework</label>
             <select id="framework" oninput="generatePrompt()">
@@ -164,7 +162,7 @@
 
     <div class="preview-section">
         <div class="prompt-header">Generated Prompt</div>
-        <div id="output">Start typing to generate...</div>
+        <div id="output">Your strategic prompt will appear here...</div>
         <button class="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
     </div>
 </div>
@@ -176,22 +174,15 @@
         const obj = document.getElementById('objective').value;
         const ctx = document.getElementById('context').value || "[Context]";
         const frm = document.getElementById('framework').value;
-
         const fullPrompt = `Act as a Senior Managing Partner at a top-tier global strategy consultancy. \n\nCONTEXT: ${ctx}\n\nTASK: Provide a high-level ${obj} using the ${frm}.\n\nCONSTRAINTS: \n- Use a Candid & Executive tone.\n- Prioritize EBITDA impact.\n- Structure for a Board audience.`;
-
         document.getElementById('output').innerText = fullPrompt;
     }
 
     function copyPrompt() {
         const text = document.getElementById('output').innerText;
         const btn = document.querySelector('.copy-btn');
-        
         if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(() => {
-                showSuccess(btn);
-            }).catch(err => {
-                fallbackCopy(text, btn);
-            });
+            navigator.clipboard.writeText(text).then(() => showSuccess(btn)).catch(() => fallbackCopy(text, btn));
         } else {
             fallbackCopy(text, btn);
         }
@@ -201,12 +192,8 @@
         const textArea = document.getElementById('tempCopyArea');
         textArea.value = text;
         textArea.select();
-        try {
-            document.execCommand('copy');
-            showSuccess(btn);
-        } catch (err) {
-            btn.innerText = "ERROR - TRY MANUAL COPY";
-        }
+        document.execCommand('copy');
+        showSuccess(btn);
     }
 
     function showSuccess(btn) {
@@ -218,9 +205,7 @@
             btn.style.backgroundColor = "var(--accent)";
         }, 2000);
     }
-
     window.onload = generatePrompt;
 </script>
-
 </body>
 </html>
