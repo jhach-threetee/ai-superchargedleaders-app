@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strategy Consultant Prompt Generator</title>
+    <title>Strategy Consultant App</title>
     <style>
         :root {
             --primary: #1F4F98;
@@ -11,76 +11,141 @@
             --accent: #F4C744;
             --white: #FFFFFF;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; padding: 20px; color: var(--navy); }
-        .container { max-width: 800px; margin: 0 auto; background: var(--white); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
-        h1 { color: var(--navy); margin-bottom: 5px; }
-        p.subtitle { color: #666; margin-bottom: 25px; }
-        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.9rem; }
-        select, textarea, input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
-        .prompt-preview { margin-top: 30px; padding: 20px; background: #f9f9f9; border: 2px dashed var(--primary); border-radius: 8px; position: relative; }
-        .prompt-header { font-weight: bold; color: var(--primary); margin-bottom: 10px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
-        #output { white-space: pre-wrap; line-height: 1.5; color: #333; }
-        .copy-btn { margin-top: 20px; background-color: var(--accent); color: var(--navy); border: none; padding: 15px 30px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.3s; }
-        .copy-btn:hover { background-color: #e0b63d; transform: translateY(-2px); }
+        /* Remove body margins and set background to pure white */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--white); 
+            margin: 0; 
+            padding: 0; 
+            color: var(--navy);
+            overflow: hidden; /* Prevents internal scrollbars */
+        }
+        
+        .app-wrapper {
+            display: flex;
+            gap: 30px;
+            padding: 10px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Left Column: Inputs */
+        .input-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Right Column: Preview */
+        .preview-section {
+            flex: 1;
+            background: #F8FAFC; /* Light gray to distinguish the output area */
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 { font-size: 1.2rem; margin: 0 0 10px 0; color: var(--navy); }
+        label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #555; }
+        
+        select, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #D1D5DB; 
+            border-radius: 4px; 
+            font-size: 0.95rem; 
+            font-family: inherit;
+        }
+
+        textarea { resize: none; }
+
+        .prompt-header { font-size: 0.75rem; font-weight: bold; color: var(--primary); margin-bottom: 8px; }
+        #output { 
+            font-size: 0.9rem; 
+            line-height: 1.5; 
+            color: #333; 
+            white-space: pre-wrap; 
+            flex-grow: 1;
+        }
+
+        .copy-btn { 
+            margin-top: 15px; 
+            background-color: var(--accent); 
+            color: var(--navy); 
+            border: none; 
+            padding: 12px; 
+            font-weight: bold; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .copy-btn:hover { opacity: 0.9; }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .app-wrapper { flex-direction: column; }
+            body { overflow: auto; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Strategic Consultant AI</h1>
-    <p class="subtitle">Generate high-level strategic frameworks for your business challenges.</p>
+<div class="app-wrapper">
+    <div class="input-section">
+        <h2>Strategic Consultant</h2>
+        
+        <div>
+            <label>Strategic Objective</label>
+            <select id="objective" oninput="generatePrompt()">
+                <option value="Market Disruption Strategy">Market Disruption Strategy</option>
+                <option value="Operational Excellence & Margin Expansion">Operational Excellence</option>
+                <option value="Inorganic Growth (M&A) Analysis">M&A / Inorganic Growth</option>
+                <option value="Product-Market Fit Review">Product-Market Fit Review</option>
+            </select>
+        </div>
 
-    <label>What is your core objective?</label>
-    <select id="objective" oninput="generatePrompt()">
-        <option value="Market Entry Analysis">Market Entry Analysis</option>
-        <option value="Operational Efficiency Audit">Operational Efficiency Audit</option>
-        <option value="Competitive SWOT Analysis">Competitive SWOT Analysis</option>
-        <option value="Product-Market Fit Review">Product-Market Fit Review</option>
-    </select>
+        <div>
+            <label>Specific Challenge</label>
+            <textarea id="context" rows="4" placeholder="e.g. Revenue has plateaued in mid-market..." oninput="generatePrompt()"></textarea>
+        </div>
 
-    <label>The Context / Specific Challenge (What's happening?)</label>
-    <textarea id="context" rows="3" placeholder="e.g. Our revenue has plateaued in the mid-market segment despite high NPS scores..." oninput="generatePrompt()"></textarea>
-
-    <label>Desired Output Framework</label>
-    <select id="framework" oninput="generatePrompt()">
-        <option value="MECE Framework (Mutually Exclusive, Collectively Exhaustive)">MECE Framework</option>
-        <option value="Porter's Five Forces">Porter's Five Forces</option>
-        <option value="Blue Ocean Strategy">Blue Ocean Strategy</option>
-        <option value="Actionable 30-60-90 Day Plan">Actionable 30-60-90 Day Plan</option>
-    </select>
-
-    <label>Tone of Analysis</label>
-    <select id="tone" oninput="generatePrompt()">
-        <option value="Direct & Objective">Direct & Objective</option>
-        <option value="Visionary & Inspirational">Visionary & Inspirational</option>
-        <option value="Critical & Risk-Averse">Critical & Risk-Averse</option>
-    </select>
-
-    <div class="prompt-preview">
-        <div class="prompt-header">Your Tailored Prompt (Auto-populating)</div>
-        <div id="output">Please fill in the fields above to see your prompt...</div>
+        <div>
+            <label>Framework</label>
+            <select id="framework" oninput="generatePrompt()">
+                <option value="The 3C’s Model (Company, Customer, Competitor)">The 3C’s Model</option>
+                <option value="Porter's Five Forces">Porter's Five Forces</option>
+                <option value="MECE Strategic Breakdown">MECE Breakdown</option>
+                <option value="Actionable 30-60-90 Day Plan">30-60-90 Day Plan</option>
+            </select>
+        </div>
     </div>
 
-    <button class="copy-btn" onclick="copyPrompt()">COPY PROMPT TO CLIPBOARD</button>
+    <div class="preview-section">
+        <div class="prompt-header">GENERATED PROMPT</div>
+        <div id="output">Fill the fields to generate...</div>
+        <button class="copy-btn" onclick="copyPrompt()">COPY PROMPT</button>
+    </div>
 </div>
 
 <script>
     function generatePrompt() {
-        const objective = document.getElementById('objective').value;
-        const context = document.getElementById('context').value || "[Describe your challenge here]";
-        const framework = document.getElementById('framework').value;
-        const tone = document.getElementById('tone').value;
+        const obj = document.getElementById('objective').value;
+        const ctx = document.getElementById('context').value || "...";
+        const frm = document.getElementById('framework').value;
 
-        const fullPrompt = `Act as a Senior Strategy Consultant with 20 years of experience in ${objective}. 
+        const fullPrompt = `Act as a Senior Managing Partner at a top-tier global strategy consultancy. 
 
-CORE CONTEXT: ${context}
+CONTEXT: ${ctx}
 
-YOUR TASK: Analyze the situation above and provide a detailed strategic breakdown using the ${framework}. 
+TASK: Provide a high-level ${obj} using the ${frm}. 
 
 CONSTRAINTS: 
-- Use a ${tone} tone.
-- Prioritize high-impact, low-effort wins.
-- Structure the response for an Executive audience (concise, data-driven, and actionable).`;
+- Use a Candid & Executive tone.
+- Prioritize EBITDA impact and resource efficiency.
+- Structure for a Board-level audience.`;
 
         document.getElementById('output').innerText = fullPrompt;
     }
@@ -88,11 +153,11 @@ CONSTRAINTS:
     function copyPrompt() {
         const text = document.getElementById('output').innerText;
         navigator.clipboard.writeText(text).then(() => {
-            alert("Prompt copied! You can now paste it into ChatGPT, Claude, or Gemini.");
+            const btn = document.querySelector('.copy-btn');
+            btn.innerText = "COPIED!";
+            setTimeout(() => { btn.innerText = "COPY PROMPT"; }, 2000);
         });
     }
-
-    // Initialize on load
     window.onload = generatePrompt;
 </script>
 
