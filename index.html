@@ -12,40 +12,39 @@
             --white: #FFFFFF;
         }
         
-        /* 1. Reset and Forced Centering */
+        /* Reset */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             background-color: var(--primary);
-            display: grid;
-            place-items: center; /* This forces the app-wrapper to be dead center */
         }
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             color: var(--white);
             overflow: hidden; 
+            display: block;
         }
         
-        /* 2. Main App Container */
+        /* Main App Container */
         .app-wrapper {
             display: flex;
             gap: 30px;
-            width: 95%; /* Takes up most of the iframe width */
-            max-width: 900px;
+            width: 98%; 
+            max-width: 950px;
             padding: 20px;
+            margin: 0; 
             box-sizing: border-box;
         }
 
-        /* 3. Columns */
+        /* Columns */
         .input-section {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            text-align: left; /* Keep labels left-aligned inside the center box */
         }
 
         .preview-section {
@@ -57,7 +56,6 @@
             display: flex;
             flex-direction: column;
             min-height: 320px;
-            text-align: left;
         }
 
         h2 { font-size: 1.4rem; margin: 0 0 10px 0; color: var(--accent); }
@@ -74,16 +72,47 @@
             font-family: inherit;
         }
 
-        .prompt-header { font-size: 0.75rem; font-weight: bold; color: var(--accent); margin-bottom: 12px; border-bottom: 1px solid rgba(244, 199, 68, 0.3); padding-bottom: 8px; }
-        #output { font-size: 0.85rem; line-height: 1.6; color: var(--white); white-space: pre-wrap; flex-grow: 1; }
+        textarea { resize: none; }
+
+        .prompt-header { 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            color: var(--accent); 
+            margin-bottom: 12px; 
+            border-bottom: 1px solid rgba(244, 199, 68, 0.3); 
+            padding-bottom: 8px; 
+        }
+        
+        #output { 
+            font-size: 0.85rem; 
+            line-height: 1.6; 
+            color: var(--white); 
+            white-space: pre-wrap; 
+            flex-grow: 1; 
+        }
 
         .copy-btn { 
-            margin-top: 20px; background-color: var(--accent); color: var(--navy); border: none; padding: 14px; 
-            font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; font-size: 0.85rem; text-transform: uppercase;
+            margin-top: 20px; 
+            background-color: var(--accent); 
+            color: var(--navy); 
+            border: none; 
+            padding: 14px; 
+            font-weight: 800; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-size: 0.85rem; 
+            text-transform: uppercase;
         }
         .copy-btn:hover { background-color: #FFFFFF; }
 
-        /* Responsive stack for mobile */
+        /* Hidden textarea for the fallback copy method */
+        #tempCopyArea {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+        }
+
         @media (max-width: 768px) {
             .app-wrapper { flex-direction: column; width: 100%; height: auto; padding: 10px; }
             body { overflow-y: auto; display: block; }
@@ -95,6 +124,7 @@
 <div class="app-wrapper">
     <div class="input-section">
         <h2>Strategic Consultant</h2>
+        
         <div>
             <label>Strategic Objective</label>
             <select id="objective" oninput="generatePrompt()">
@@ -104,10 +134,12 @@
                 <option value="Product-Market Fit Review">Product-Market Fit Review</option>
             </select>
         </div>
+
         <div>
             <label>Context / Challenge</label>
             <textarea id="context" rows="5" placeholder="Outline the current situation..." oninput="generatePrompt()"></textarea>
         </div>
+
         <div>
             <label>Framework</label>
             <select id="framework" oninput="generatePrompt()">
@@ -126,23 +158,61 @@
     </div>
 </div>
 
+<textarea id="tempCopyArea"></textarea>
+
 <script>
     function generatePrompt() {
         const obj = document.getElementById('objective').value;
         const ctx = document.getElementById('context').value || "[Context]";
         const frm = document.getElementById('framework').value;
-        document.getElementById('output').innerText = `Act as a Senior Managing Partner at a top-tier global strategy consultancy. \n\nCONTEXT: ${ctx}\n\nTASK: Provide a high-level ${obj} using the ${frm}.\n\nCONSTRAINTS: \n- Use a Candid & Executive tone.\n- Prioritize EBITDA impact.\n- Structure for a Board audience.`;
+
+        const fullPrompt = `Act as a Senior Managing Partner at a top-tier global strategy consultancy. \n\nCONTEXT: ${ctx}\n\nTASK: Provide a high-level ${obj} using the ${frm}.\n\nCONSTRAINTS: \n- Use a Candid & Executive tone.\n- Prioritize EBITDA impact.\n- Structure for a Board audience.`;
+
+        document.getElementById('output').innerText = fullPrompt;
     }
 
     function copyPrompt() {
         const text = document.getElementById('output').innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            const btn = document.querySelector('.copy-btn');
-            btn.innerText = "COPIED!";
-            setTimeout(() => { btn.innerText = "COPY PROMPT"; }, 2000);
-        });
+        const btn = document.querySelector('.copy-btn');
+        
+        // 1. Try the modern way first
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                showSuccess(btn);
+            }).catch(err => {
+                fallbackCopy(text, btn);
+            });
+        } else {
+            // 2. Use the fallback if navigator is not available
+            fallbackCopy(text, btn);
+        }
     }
+
+    function fallbackCopy(text, btn) {
+        const textArea = document.getElementById('tempCopyArea');
+        textArea.value = text;
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showSuccess(btn);
+        } catch (err) {
+            console.error('Fallback copy failed', err);
+            btn.innerText = "ERROR - TRY MANUAL COPY";
+        }
+    }
+
+    function showSuccess(btn) {
+        const originalText = btn.innerText;
+        btn.innerText = "COPIED!";
+        btn.style.backgroundColor = "#FFFFFF";
+        setTimeout(() => { 
+            btn.innerText = originalText; 
+            btn.style.backgroundColor = "var(--accent)";
+        }, 2000);
+    }
+
     window.onload = generatePrompt;
 </script>
+
 </body>
 </html>
