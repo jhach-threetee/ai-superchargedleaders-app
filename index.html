@@ -13,44 +13,46 @@
         }
         
         * { box-sizing: border-box; }
+        
+        /* THE FLUID FIX: Allow the app to be as tall as the content */
         html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--navy); overflow-x: hidden;
+            margin: 0; padding: 0; width: 100%; min-height: 100%;
+            background-color: var(--navy); 
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: var(--white); display: flex; justify-content: center; }
         
-        /* Layout Wrapper */
         .app-wrapper {
-            display: flex; flex-direction: row; gap: 20px; width: 100%; max-width: 1100px;
-            height: 100vh; padding: 20px; box-sizing: border-box;
+            display: flex; flex-direction: row; gap: 30px; width: 100%; max-width: 1100px;
+            padding: 20px; box-sizing: border-box;
+            min-height: 100vh;
         }
 
-        /* Desktop: Scrollable Input Section */
+        /* Input Column */
         .input-section {
             flex: 1.2; display: flex; flex-direction: column; gap: 10px;
-            overflow-y: auto; overflow-x: hidden; padding-bottom: 30px; padding-right: 15px;
         }
 
-        /* Desktop: Fixed Preview Section */
+        /* Preview Column: Sticky on Desktop so it follows you down */
         .preview-section {
-            flex: 0.8; background: rgba(255, 255, 255, 0.08); padding: 20px;
+            flex: 0.8; background: rgba(255, 255, 255, 0.08); padding: 25px;
             border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex; flex-direction: column; height: calc(100% - 40px); box-sizing: border-box;
+            display: flex; flex-direction: column; 
+            height: fit-content; position: sticky; top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        h3 { font-size: 0.85rem; margin: 15px 0 5px 0; color: var(--accent); border-bottom: 1px solid rgba(244, 199, 68, 0.2); padding-bottom: 3px; text-transform: uppercase; }
-        
-        .field-group { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; width: 100%; }
-        .row-group { display: flex; align-items: flex-start; gap: 10px; margin-top: 8px; width: 100%; }
+        h3 { font-size: 0.85rem; margin: 20px 0 8px 0; color: var(--accent); border-bottom: 1px solid rgba(244, 199, 68, 0.2); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .field-group { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; width: 100%; }
+        .row-group { display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; width: 100%; }
         
         .flex-row { display: flex; gap: 10px; width: 100%; }
         .flex-item { flex: 1; }
 
-        .checkbox-grid {
-            display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; width: 100%;
-        }
-        .checkbox-item { display: flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 0.8rem; }
+        .checkbox-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; width: 100%; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 0.85rem; font-weight: 600; }
 
         label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; }
         .hint { font-size: 0.65rem; opacity: 0.7; font-weight: normal; font-style: italic; margin-bottom: 2px; }
@@ -60,54 +62,22 @@
             border-radius: 6px; font-size: 0.95rem; background: var(--white); color: var(--navy); font-family: inherit;
         }
 
-        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
+        input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; flex-shrink: 0; }
+        .hidden-field { display: none; margin-top: 8px; width: 100%; }
 
-        .hidden-field { display: none; margin-top: 5px; width: 100%; }
-
-        .prompt-header { 
-            font-size: 0.7rem; font-weight: bold; color: var(--accent); 
-            margin-bottom: 10px; border-bottom: 1px solid rgba(244, 199, 68, 0.3); padding-bottom: 5px; 
-        }
-        
-        #output { 
-            font-size: 0.85rem; line-height: 1.5; color: var(--white); 
-            white-space: pre-wrap; overflow-y: auto; flex-grow: 1; margin-bottom: 15px; padding-right: 5px;
-        }
+        .prompt-header { font-size: 0.75rem; font-weight: bold; color: var(--accent); margin-bottom: 12px; border-bottom: 1px solid rgba(244, 199, 68, 0.3); padding-bottom: 8px; text-transform: uppercase; }
+        #output { font-size: 0.9rem; line-height: 1.6; color: var(--white); white-space: pre-wrap; margin-bottom: 20px; }
 
         .copy-btn { 
-            background-color: var(--accent); color: var(--navy); border: none; padding: 14px; 
-            font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; 
-            font-size: 0.85rem; text-transform: uppercase; flex-shrink: 0;
+            background-color: var(--accent); color: var(--navy); border: none; padding: 16px; 
+            font-weight: 800; border-radius: 8px; cursor: pointer; transition: 0.3s; 
+            font-size: 0.9rem; text-transform: uppercase; width: 100%;
         }
-        .copy-btn:hover { background-color: #FFFFFF; }
+        .copy-btn:hover { background-color: #FFFFFF; transform: translateY(-2px); }
 
-        /* Custom Scrollbar */
-        .input-section::-webkit-scrollbar, #output::-webkit-scrollbar { width: 6px; }
-        .input-section::-webkit-scrollbar-thumb, #output::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-
-        /* MOBILE OVERHAUL */
-        @media (max-width: 800px) {
-            html, body { overflow-y: auto; height: auto; }
-            .app-wrapper { 
-                flex-direction: column; 
-                height: auto; 
-                padding: 15px; 
-                gap: 25px;
-            }
-            .input-section { 
-                flex: none; 
-                width: 100%; 
-                overflow: visible; 
-                padding-right: 0; 
-            }
-            .preview-section { 
-                flex: none; 
-                width: 100%; 
-                height: 450px; /* Fixed height for the result on mobile */
-                margin-top: 10px; 
-                position: sticky; /* Keeps prompt in view as you scroll if desired */
-                bottom: 20px;
-            }
+        @media (max-width: 850px) {
+            .app-wrapper { flex-direction: column; height: auto; padding: 15px; }
+            .preview-section { position: relative; top: 0; width: 100%; height: auto; margin-top: 20px; }
             .flex-row { flex-direction: column; }
         }
     </style>
@@ -117,21 +87,19 @@
 <div class="app-wrapper">
     <div class="input-section">
         <div class="field-group">
-            <label>Select Expert Role</label>
+            <label>Expert Role</label>
             <select id="roleSelector" onchange="renderRoleUI()">
-                <option value="Translator">Translator</option>
                 <option value="Film Director">Film Director</option>
+                <option value="Translator">Translator</option>
                 <option value="Other">Other (General Purpose)</option>
             </select>
         </div>
-
-        <div id="roleFields">
-            </div>
+        <div id="roleFields"></div>
     </div>
 
     <div class="preview-section">
-        <div class="prompt-header">Generated Prompt</div>
-        <div id="output">Fill the fields to generate...</div>
+        <div class="prompt-header">Generated Expert Prompt</div>
+        <div id="output">Generating...</div>
         <button class="copy-btn" onclick="copyPrompt()">Copy to Clipboard</button>
     </div>
 </div>
@@ -157,104 +125,29 @@
         const role = document.getElementById('roleSelector').value;
         const container = document.getElementById('roleFields');
         
-        if (role === "Other") {
-            container.innerHTML = `
-                <h3>The Fundamentals</h3>
-                <div class="field-group"><label>Acting Role</label><input type="text" id="customRole" placeholder="e.g. Senior VP of Sales, Crisis Manager, Lead Architect..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label>Context</label><textarea id="customContext" rows="3" placeholder="e.g. Preparing for a board meeting / Revenue down 10% / Launching in a new region..." oninput="generatePrompt()"></textarea></div>
-                <div class="field-group"><label>Task</label><textarea id="customTask" rows="3" placeholder="e.g. Write a strategy memo / Draft a 3-month roadmap / Critique this proposal..." oninput="generatePrompt()"></textarea></div>
-
-                <h3>Strategic Levers (Optional)</h3>
-                <div class="row-group"><input type="checkbox" id="checkAudience" onchange="toggleField('checkAudience', 'inputAudience')"><label>Target Audience</label></div>
-                <input type="text" id="inputAudience" class="hidden-field" placeholder="e.g. Investor Committee, Skeptical Stakeholders, New Employees..." oninput="generatePrompt()">
-
-                <div class="row-group"><input type="checkbox" id="checkConstraints" onchange="toggleField('checkConstraints', 'inputConstraints')"><label>Constraints</label></div>
-                <input type="text" id="inputConstraints" class="hidden-field" placeholder="e.g. Keep under 300 words, avoid industry jargon, don't mention project X..." oninput="generatePrompt()">
-
-                <div class="row-group"><input type="checkbox" id="checkFormat" onchange="toggleField('checkFormat', 'inputFormat')"><label>Format</label></div>
-                <input type="text" id="inputFormat" class="hidden-field" placeholder="e.g. 5-Slide Outline, Comparative Table, Executive Summary, Bulleted List..." oninput="generatePrompt()">
-
-                <div class="row-group"><input type="checkbox" id="checkTone" onchange="toggleField('checkTone', 'inputTone')"><label>Tone</label></div>
-                <input type="text" id="inputTone" class="hidden-field" placeholder="e.g. Direct & Analytical, Visionary & Inspirational, Humble & Apologetic..." oninput="generatePrompt()">
-            `;
-        } else if (role === "Translator") {
-            container.innerHTML = `
-                <h3>Languages</h3>
-                <div class="flex-row">
-                    <div class="field-group flex-item">
-                        <label>Source Language</label>
-                        <input type="text" id="sourceLang" placeholder="e.g. French, Mandarin, German..." oninput="generatePrompt()">
-                    </div>
-                    <div class="field-group flex-item">
-                        <label>Target Language</label>
-                        <input type="text" id="targetLang" placeholder="e.g. UK English, Spanish, Brazilian Portuguese..." oninput="generatePrompt()">
-                    </div>
-                </div>
-
-                <h3>Specifications</h3>
-                <div class="field-group">
-                    <label>Tone & Intent</label>
-                    <select id="transTone" onchange="toggleSelectOther('transTone', 'transToneOther')">
-                        <option value="Professional">Professional</option>
-                        <option value="Literal">Literal</option>
-                        <option value="Creative">Creative</option>
-                        <option value="Formal">Formal</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <input type="text" id="transToneOther" class="hidden-field" placeholder="Specify custom tone (e.g. Diplomatic, Persuasive)..." oninput="generatePrompt()">
-                </div>
-                
-                <div class="field-group">
-                    <label>Material Type</label>
-                    <select id="transMaterial" onchange="toggleSelectOther('transMaterial', 'transMaterialOther')">
-                        <option value="Legal Contract">Legal Contract</option>
-                        <option value="Marketing Copy">Marketing Copy</option>
-                        <option value="Technical Manual">Technical Manual</option>
-                        <option value="Internal Email">Internal Email</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <input type="text" id="transMaterialOther" class="hidden-field" placeholder="Specify material (e.g. Patent Filing, Press Release)..." oninput="generatePrompt()">
-                </div>
-
-                <h3>Context & Nuance</h3>
-                <div class="field-group">
-                    <label>Usage Context</label>
-                    <textarea id="transContext" rows="3" placeholder="e.g. Keynote speech in Tokyo, sensitive negotiation in Dubai, HR policy for remote teams..." oninput="generatePrompt()"></textarea>
-                </div>
-                
-                <div class="checkbox-grid">
-                    <div class="checkbox-item"><input type="checkbox" id="checkNuance" onchange="generatePrompt()"><label>Include Cultural Nuance Report</label></div>
-                    <div class="checkbox-item"><input type="checkbox" id="checkProtect" onchange="toggleField('checkProtect', 'inputProtect')"><label>Terminology Protection</label></div>
-                </div>
-                <input type="text" id="inputProtect" class="hidden-field" placeholder="List terms to NEVER translate (e.g. Brand names, specific patent IDs)..." oninput="generatePrompt()">
-
-                <h3>Content to Translate</h3>
-                <div class="field-group">
-                    <label>Source Text</label>
-                    <textarea id="transSource" rows="6" placeholder="Paste your text here. e.g. 'We are pleased to announce our expansion...' or 'Draft agreement for the acquisition of...'" oninput="generatePrompt()"></textarea>
-                </div>
-            `;
-        } else if (role === "Film Director") {
+        if (role === "Film Director") {
             container.innerHTML = `
                 <h3>Cinematography</h3>
                 <div class="field-group">
                     <label>Shot Type / Angle</label>
                     <select id="shotType" onchange="toggleSelectOther('shotType', 'shotTypeOther')">
-                        <option value="Wide Shot">Wide Shot</option>
-                        <option value="Medium Shot">Medium Shot</option>
-                        <option value="Close-up">Close-up</option>
-                        <option value="Low Angle">Low Angle</option>
-                        <option value="High Angle">High Angle</option>
-                        <option value="Bird’s Eye View">Bird’s Eye View</option>
+                        <option value="Wide Shot (Establishing context)">Wide Shot (Establishing context)</option>
+                        <option value="Medium Shot (Standard interaction)">Medium Shot (Standard interaction)</option>
+                        <option value="Close-up (Emotional impact)">Close-up (Emotional impact)</option>
+                        <option value="Low Angle (Power/Authority)">Low Angle (Power/Authority)</option>
+                        <option value="High Angle (Overview/Vulnerability)">High Angle (Overview/Vulnerability)</option>
+                        <option value="Bird’s Eye View (Strategy/Scale)">Bird’s Eye View (Strategy/Scale)</option>
                         <option value="Other">Other</option>
                     </select>
-                    <input type="text" id="shotTypeOther" class="hidden-field" placeholder="e.g. Dutch Angle, Handheld POV..." oninput="generatePrompt()">
+                    <input type="text" id="shotTypeOther" class="hidden-field" placeholder="e.g. Dutch Angle for psychological tension / Handheld POV tracking shot...">
                 </div>
-                <div class="row-group"><input type="checkbox" id="camMoveCheck" onchange="toggleField('camMoveCheck', 'camMoveInput')"><label>Camera Movement?</label></div>
-                <div id="camMoveInput" class="hidden-field"><input type="text" id="camMoveText" placeholder="e.g. Slow Dolly Zoom, 360-degree rotation..." oninput="generatePrompt()"></div>
+                <div class="row-group"><input type="checkbox" id="camMoveCheck" onchange="toggleField('camMoveCheck', 'camMoveInput')"><label>Include Camera Movement?</label></div>
+                <div id="camMoveInput" class="hidden-field"><input type="text" id="camMoveText" placeholder="e.g. Slow Dolly Zoom (Vertigo effect), 360-degree gimbal rotation, Crane sweep..." oninput="generatePrompt()"></div>
 
-                <h3>Subject & Environment</h3>
-                <div class="field-group"><label>Subject Action</label><textarea id="subjectAction" rows="3" placeholder="e.g. CEO - Pacing the board room - Wiping brow with a smirk..." oninput="generatePrompt()"></textarea></div>
+                <h3>Subject & Action</h3>
+                <div class="field-group"><label>Subject Description</label><span class="hint">[Who/What] - [Specific action] - [Expressions/gestures]</span><textarea id="subjectAction" rows="3" placeholder="e.g. The CEO - Pacing the executive board room alone at night - Clenching jaw while staring at a failing metric on a holographic screen..." oninput="generatePrompt()"></textarea></div>
+
+                <h3>Environment</h3>
                 <div class="field-group">
                     <label>Setting</label>
                     <select id="setting" onchange="toggleSelectOther('setting', 'settingOther')">
@@ -262,66 +155,12 @@
                         <option value="High-tech Innovation Lab">High-tech Innovation Lab</option>
                         <option value="Futuristic Urban Skyline">Futuristic Urban Skyline</option>
                         <option value="Sustainable Green Campus">Sustainable Green Campus</option>
+                        <option value="Industrial Factory Floor">Industrial Factory Floor</option>
                         <option value="Other">Other</option>
                     </select>
-                    <input type="text" id="settingOther" class="hidden-field" placeholder="Specify setting details..." oninput="generatePrompt()">
+                    <input type="text" id="settingOther" class="hidden-field" placeholder="e.g. Overcrowded underground server farm / Lush hydroponic garden office...">
                 </div>
-
-                <h3>Negative Prompt</h3>
-                <div class="checkbox-grid">
-                    <div class="checkbox-item"><input type="checkbox" class="neg-check" value="no subtitles" onchange="generatePrompt()">No Subtitles</div>
-                    <div class="checkbox-item"><input type="checkbox" class="neg-check" value="no text" onchange="generatePrompt()">No Text</div>
-                    <div class="checkbox-item"><input type="checkbox" class="neg-check" value="no watermarks" onchange="generatePrompt()">No Watermarks</div>
-                </div>
-            `;
-        }
-        generatePrompt();
-    }
-
-    function generatePrompt() {
-        const role = document.getElementById('roleSelector').value;
-        let p = "";
-        const getVal = (id, otherId) => {
-            const el = document.getElementById(id);
-            if (!el) return "";
-            if (el.value === "Other") return document.getElementById(otherId).value || "[Custom]";
-            return el.value;
-        };
-
-        if (role === "Other") {
-            const r = document.getElementById('customRole').value || "[Role]";
-            const c = document.getElementById('customContext').value || "[Context]";
-            const t = document.getElementById('customTask').value || "[Task]";
-            p = `Act as an expert ${r}.\n\nBACKGROUND: ${c}\n\nYOUR TASK: ${t}`;
-            if (document.getElementById('checkAudience').checked) p += `\n\nTARGET AUDIENCE: ${document.getElementById('inputAudience').value}`;
-            if (document.getElementById('checkFormat').checked) p += `\n\nOUTPUT FORMAT: ${document.getElementById('inputFormat').value}`;
-            if (document.getElementById('checkTone').checked) p += `\n\nTONE: ${document.getElementById('inputTone').value}`;
-            if (document.getElementById('checkConstraints').checked) p += `\n\nCONSTRAINTS: ${document.getElementById('inputConstraints').value}`;
-        } else if (role === "Translator") {
-            const sourceL = document.getElementById('sourceLang').value || "[Source]";
-            const targetL = document.getElementById('targetLang').value || "[Target]";
-            p = `Act as a master Localization Expert and Translator. Translate from ${sourceL} to ${targetL}.\n\nSPECIFICATIONS:\n- Tone: ${getVal('transTone', 'transToneOther')}\n- Material: ${getVal('transMaterial', 'transMaterialOther')}\n- Context: ${document.getElementById('transContext').value}`;
-            if (document.getElementById('checkNuance').checked) p += `\n\nINSTRUCTION: Provide a brief Cultural Nuance Report.`;
-            if (document.getElementById('checkProtect').checked) p += `\n\nDO NOT TRANSLATE: ${document.getElementById('inputProtect').value}`;
-            p += `\n\nSOURCE TEXT:\n"""\n${document.getElementById('transSource').value || "[Text]"}\n"""`;
-        } else if (role === "Film Director") {
-            p = `Act as a world-class Film Director.\n\nVISUAL SPECS:\n- Shot: ${getVal('shotType', 'shotTypeOther')}\n- Movement: ${document.getElementById('camMoveCheck').checked ? document.getElementById('camMoveText').value : "Static"}\n\nSUBJECT & SETTING:\n- Action: ${document.getElementById('subjectAction').value || "[Action]"}\n- Setting: ${getVal('setting', 'settingOther')}`;
-        }
-        document.getElementById('output').innerText = p;
-    }
-
-    function copyPrompt() {
-        const text = document.getElementById('output').innerText;
-        const btn = document.querySelector('.copy-btn');
-        const textArea = document.getElementById('tempCopyArea');
-        textArea.value = text;
-        textArea.select();
-        document.execCommand('copy');
-        btn.innerText = "COPIED!";
-        btn.style.backgroundColor = "#FFFFFF";
-        setTimeout(() => { btn.innerText = "COPY TO CLIPBOARD"; btn.style.backgroundColor = "var(--accent)"; }, 2000);
-    }
-    window.onload = renderRoleUI;
-</script>
-</body>
-</html>
+                <div class="field-group">
+                    <label>Time of Day</label>
+                    <select id="timeOfDay" onchange="toggleSelectOther('timeOfDay', 'timeOther')">
+                        <option value="Golden Hour (Warm/A
