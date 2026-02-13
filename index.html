@@ -1,174 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strategy Consultant App</title>
-    <style>
-        :root {
-            --primary: #1F4F98;
-            --navy: #0C2867;
-            --accent: #F4C744;
-            --white: #FFFFFF;
-        }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-color: var(--primary); /* YOUR REQUESTED COLOR */
-            margin: 0; 
-            padding: 20px; 
-            color: var(--white);
-            overflow: hidden;
-        }
-        
-        .app-wrapper {
-            display: flex;
-            gap: 25px;
-            max-width: 1000px;
-            margin: 0 auto;
-            align-items: flex-start;
-        }
-
-        /* Left Column: Inputs */
-        .input-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        /* Right Column: Preview */
-        .preview-section {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.1); /* Subtle glass effect */
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            flex-direction: column;
-            min-height: 300px;
-        }
-
-        h2 { font-size: 1.4rem; margin: 0 0 5px 0; color: var(--accent); }
-        label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--white); opacity: 0.9; }
-        
-        select, textarea { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid rgba(255, 255, 255, 0.3); 
-            border-radius: 6px; 
-            font-size: 0.95rem; 
-            background: var(--white);
-            color: var(--navy);
-            font-family: inherit;
-        }
-
-        textarea { resize: none; }
-
-        .prompt-header { font-size: 0.75rem; font-weight: bold; color: var(--accent); margin-bottom: 10px; border-bottom: 1px solid rgba(244, 199, 68, 0.3); padding-bottom: 5px; }
-        
-        #output { 
-            font-size: 0.9rem; 
-            line-height: 1.6; 
-            color: var(--white); 
-            white-space: pre-wrap; 
-            flex-grow: 1;
-        }
-
-        .copy-btn { 
-            margin-top: 15px; 
-            background-color: var(--accent); 
-            color: var(--navy); 
-            border: none; 
-            padding: 14px; 
-            font-weight: bold; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            transition: 0.2s;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-        }
-        .copy-btn:hover { transform: scale(1.02); background-color: #ffd86b; }
-
-        @media (max-width: 768px) {
-            .app-wrapper { flex-direction: column; }
-            body { overflow: auto; }
-        }
-    </style>
-</head>
-<body>
-
-<div class="app-wrapper">
-    <div class="input-section">
-        <h2>Strategic Consultant</h2>
-        
-        <div>
-            <label>Strategic Objective</label>
-            <select id="objective" oninput="generatePrompt()">
-                <option value="Market Disruption Strategy">Market Disruption Strategy</option>
-                <option value="Operational Excellence & Margin Expansion">Operational Excellence</option>
-                <option value="Inorganic Growth (M&A) Analysis">M&A / Inorganic Growth</option>
-                <option value="Product-Market Fit Review">Product-Market Fit Review</option>
-            </select>
-        </div>
-
-        <div>
-            <label>Context / Challenge</label>
-            <textarea id="context" rows="4" placeholder="Describe the current situation..." oninput="generatePrompt()"></textarea>
-        </div>
-
-        <div>
-            <label>Strategic Framework</label>
-            <select id="framework" oninput="generatePrompt()">
-                <option value="The 3C’s Model (Company, Customer, Competitor)">The 3C’s Model</option>
-                <option value="Porter's Five Forces">Porter's Five Forces</option>
-                <option value="MECE Strategic Breakdown">MECE Breakdown</option>
-                <option value="Actionable 30-60-90 Day Plan">30-60-90 Day Plan</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="preview-section">
-        <div class="prompt-header">PREVIEW YOUR STRATEGIC PROMPT</div>
-        <div id="output">Start typing to generate your prompt...</div>
-        <button class="copy-btn" onclick="copyPrompt()">COPY TO CLIPBOARD</button>
-    </div>
-</div>
-
-<script>
-    function generatePrompt() {
-        const obj = document.getElementById('objective').value;
-        const ctx = document.getElementById('context').value || "[Context will appear here]";
-        const frm = document.getElementById('framework').value;
-
-        const fullPrompt = `Act as a Senior Managing Partner at a top-tier global strategy consultancy. 
-
-CONTEXT: ${ctx}
-
-TASK: Provide a high-level ${obj} using the ${frm}. 
-
-CONSTRAINTS: 
-- Use a Candid & Executive tone.
-- Prioritize EBITDA impact and resource efficiency.
-- Structure for a Board-level audience.`;
-
-        document.getElementById('output').innerText = fullPrompt;
+<style>
+    :root {
+        --primary: #1F4F98;
+        --navy: #0C2867;
+        --accent: #F4C744;
+        --white: #FFFFFF;
+    }
+    
+    body { 
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+        background-color: var(--primary); 
+        margin: 0; 
+        padding: 20px 0; /* Removed side padding to help centering */
+        color: var(--white);
+        overflow: hidden;
+        /* THE CENTERING FIX */
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        width: 100%;
+    }
+    
+    .app-wrapper {
+        display: flex;
+        gap: 25px;
+        width: 95%; /* Use percentage for responsiveness */
+        max-width: 900px; /* Limits the width for better readability */
+        margin: 0 auto; /* Extra insurance for centering */
     }
 
-    function copyPrompt() {
-        const text = document.getElementById('output').innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            const btn = document.querySelector('.copy-btn');
-            btn.innerText = "COPIED TO CLIPBOARD!";
-            btn.style.backgroundColor = "#FFFFFF";
-            setTimeout(() => { 
-                btn.innerText = "COPY TO CLIPBOARD"; 
-                btn.style.backgroundColor = "var(--accent)";
-            }, 2000);
-        });
+    /* Left Column: Inputs */
+    .input-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
     }
-    window.onload = generatePrompt;
-</script>
 
-</body>
-</html>
+    /* Right Column: Preview */
+    .preview-section {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.1); 
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        flex-direction: column;
+        min-height: 280px;
+    }
+
+    h2 { font-size: 1.3rem; margin: 0 0 5px 0; color: var(--accent); }
+    label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--white); opacity: 0.8; }
+    
+    select, textarea { 
+        width: 100%; 
+        padding: 10px; 
+        border: 1px solid rgba(255, 255, 255, 0.3); 
+        border-radius: 6px; 
+        font-size: 0.9rem; 
+        background: var(--white);
+        color: var(--navy);
+        font-family: inherit;
+    }
+
+    .prompt-header { font-size: 0.7rem; font-weight: bold; color: var(--accent); margin-bottom: 10px; border-bottom: 1px solid rgba(244, 199, 68, 0.3); padding-bottom: 5px; }
+    
+    #output { 
+        font-size: 0.85rem; 
+        line-height: 1.5; 
+        color: var(--white); 
+        white-space: pre-wrap; 
+        flex-grow: 1;
+    }
+
+    .copy-btn { 
+        margin-top: 15px; 
+        background-color: var(--accent); 
+        color: var(--navy); 
+        border: none; 
+        padding: 12px; 
+        font-weight: bold; 
+        border-radius: 6px; 
+        cursor: pointer; 
+        transition: 0.2s;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+    /* ... (rest of your existing CSS) ... */
+</style>
