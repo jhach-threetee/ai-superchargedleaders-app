@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strategy Consultant App</title>
+    <title>Multi-Role AI Prompt Generator</title>
     <style>
         :root {
             --primary: #1F4F98;
@@ -12,126 +12,60 @@
             --white: #FFFFFF;
         }
         
-        /* 1. Reset & Lock Height */
         html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%; /* Force the app to stay within the iframe height */
-            background-color: var(--navy);
-            overflow: hidden; /* Prevent the body from scrolling */
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--navy); overflow: hidden;
         }
 
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            color: var(--white);
-            display: flex;
-            justify-content: center;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: var(--white); display: flex; justify-content: center; }
         
-        /* 2. Main Wrapper */
         .app-wrapper {
-            display: flex;
-            flex-direction: row;
-            gap: 25px;
-            width: 95%; 
-            max-width: 1000px;
-            height: 100vh; /* Fill the iframe exactly */
-            padding: 20px;
-            box-sizing: border-box;
+            display: flex; flex-direction: row; gap: 20px; width: 95%; max-width: 1050px;
+            height: 100vh; padding: 20px; box-sizing: border-box;
         }
 
-        /* 3. Input Column (Left) */
+        /* Scrollable Input Section */
         .input-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            overflow-y: auto; /* Scroll inputs if screen is short */
-            padding-bottom: 20px;
+            flex: 1; display: flex; flex-direction: column; gap: 15px;
+            overflow-y: auto; padding-bottom: 30px;
         }
 
-        /* 4. Preview Column (Right) */
+        /* Fixed Preview Section */
         .preview-section {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.08); 
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex;
-            flex-direction: column;
-            height: calc(100% - 40px); /* Fill height minus wrapper padding */
-            box-sizing: border-box;
+            flex: 1; background: rgba(255, 255, 255, 0.08); padding: 20px;
+            border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex; flex-direction: column; height: calc(100% - 40px); box-sizing: border-box;
         }
 
-        h2 { font-size: 1.4rem; margin: 0 0 5px 0; color: var(--accent); }
-        label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--white); opacity: 0.8; }
+        h2 { font-size: 1.4rem; margin: 0; color: var(--accent); }
+        .field-group { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; }
+        label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
         
-        select, textarea { 
-            width: 100%; 
-            padding: 10px; 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            border-radius: 6px; 
-            font-size: 0.95rem; 
-            background: var(--white);
-            color: var(--navy);
-            font-family: inherit;
+        select, textarea, input { 
+            width: 100%; padding: 10px; border: 1px solid rgba(255, 255, 255, 0.2); 
+            border-radius: 6px; font-size: 0.9rem; background: var(--white); color: var(--navy); font-family: inherit;
         }
 
         .prompt-header { 
-            font-size: 0.7rem; 
-            font-weight: bold; 
-            color: var(--accent); 
-            margin-bottom: 10px; 
-            border-bottom: 1px solid rgba(244, 199, 68, 0.3); 
-            padding-bottom: 8px; 
+            font-size: 0.7rem; font-weight: bold; color: var(--accent); 
+            margin-bottom: 10px; border-bottom: 1px solid rgba(244, 199, 68, 0.3); padding-bottom: 5px; 
         }
         
-        /* THE CRITICAL FIX: The text box itself scrolls so the Copy button stays visible */
         #output { 
-            font-size: 0.85rem; 
-            line-height: 1.5; 
-            color: var(--white); 
-            white-space: pre-wrap; 
-            overflow-y: auto; /* INTERNAL SCROLLING */
-            flex-grow: 1; /* Pushes button to bottom */
-            margin-bottom: 15px;
-            padding-right: 10px;
+            font-size: 0.85rem; line-height: 1.5; color: var(--white); 
+            white-space: pre-wrap; overflow-y: auto; flex-grow: 1; margin-bottom: 15px; padding-right: 5px;
         }
 
-        /* Custom Scrollbar for the output area */
-        #output::-webkit-scrollbar { width: 5px; }
-        #output::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-
         .copy-btn { 
-            background-color: var(--accent); 
-            color: var(--navy); 
-            border: none; 
-            padding: 14px; 
-            font-weight: 800; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            font-size: 0.85rem; 
-            text-transform: uppercase;
-            flex-shrink: 0; /* Prevents button from squishing */
+            background-color: var(--accent); color: var(--navy); border: none; padding: 14px; 
+            font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; 
+            font-size: 0.85rem; text-transform: uppercase; flex-shrink: 0;
         }
         .copy-btn:hover { background-color: #FFFFFF; }
 
-        #tempCopyArea { position: absolute; left: -9999px; top: 0; }
-
-        /* 5. Mobile Layout */
         @media (max-width: 768px) {
-            .app-wrapper { 
-                flex-direction: column; 
-                overflow-y: auto; /* Allow the wrapper to scroll on mobile */
-                height: auto;
-            }
-            .preview-section {
-                height: 400px; /* Fixed height so Copy button is always found */
-                margin-top: 10px;
-                flex: none;
-            }
+            .app-wrapper { flex-direction: column; overflow-y: auto; height: auto; }
+            .preview-section { height: 350px; margin-top: 10px; flex: none; }
         }
     </style>
 </head>
@@ -139,68 +73,137 @@
 
 <div class="app-wrapper">
     <div class="input-section">
-        <h2>Strategic Consultant</h2>
-        <div>
-            <label>Strategic Objective</label>
-            <select id="objective" oninput="generatePrompt()">
-                <option value="Market Disruption Strategy">Market Disruption Strategy</option>
-                <option value="Operational Excellence & Margin Expansion">Operational Excellence</option>
-                <option value="Inorganic Growth (M&A) Analysis">M&A / Inorganic Growth</option>
-                <option value="Product-Market Fit Review">Product-Market Fit Review</option>
+        <h2>Role Expert AI</h2>
+        
+        <div class="field-group">
+            <label>Select Expert Role</label>
+            <select id="roleSelector" onchange="updateUI()">
+                <option value="Management Consultant">Management Consultant</option>
+                <option value="Translator">Translator</option>
+                <option value="Film Director">Film Director</option>
+                <option value="Graphic Designer">Graphic Designer</option>
+                <option value="Communication Coach">Communication Coach</option>
+                <option value="Market Analyst">Market Analyst</option>
+                <option value="Talent Specialist">Talent Specialist</option>
+                <option value="Data Analyst">Data Analyst</option>
+                <option value="Brand Content Specialist">Brand Content Specialist</option>
+                <option value="Other">Other (Custom)</option>
             </select>
         </div>
-        <div>
-            <label>Context / Challenge</label>
-            <textarea id="context" rows="5" placeholder="Outline the current situation..." oninput="generatePrompt()"></textarea>
-        </div>
-        <div>
-            <label>Framework</label>
-            <select id="framework" oninput="generatePrompt()">
-                <option value="The 3C’s Model (Company, Customer, Competitor)">The 3C’s Model</option>
-                <option value="Porter's Five Forces">Porter's Five Forces</option>
-                <option value="MECE Strategic Breakdown">MECE Breakdown</option>
-                <option value="Actionable 30-60-90 Day Plan">30-60-90 Day Plan</option>
-            </select>
-        </div>
+
+        <div id="dynamicFields">
+            </div>
     </div>
 
     <div class="preview-section">
-        <div class="prompt-header">Generated Prompt</div>
-        <div id="output">Start typing to generate...</div>
+        <div class="prompt-header">Generated Expert Prompt</div>
+        <div id="output">Generating...</div>
         <button class="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
     </div>
 </div>
 
-<textarea id="tempCopyArea"></textarea>
+<textarea id="tempCopyArea" style="position:absolute; left:-9999px;"></textarea>
 
 <script>
+    const roleData = {
+        "Management Consultant": {
+            label1: "Strategic Objective", options1: ["Margin Expansion", "Market Entry", "M&A Integration", "Digital Transformation"],
+            label2: "Strategic Framework", options2: ["MECE Breakdown", "Porter's Five Forces", "The 3C’s Model", "SWOT Analysis"],
+            placeholder: "Describe the business friction or challenge..."
+        },
+        "Translator": {
+            label1: "Tone & Nuance", options1: ["Strictly Professional", "Creative/Idiomatic", "Technical/Legal", "Casual/Slang"],
+            label2: "Target Audience", options2: ["General Public", "Executive Board", "Local Community", "Academic Peers"],
+            placeholder: "Paste the text you need translated..."
+        },
+        "Film Director": {
+            label1: "Visual Style", options1: ["Cinematic/Anamorphic", "Gritty Documentary", "Neo-Noir High Contrast", "Whimsical/Bright"],
+            label2: "Scene Context", options2: ["Character Intro", "Action Sequence", "Tense Dialogue", "Atmospheric B-Roll"],
+            placeholder: "Describe the scene plot or script snippet..."
+        },
+        "Graphic Designer": {
+            label1: "Design Aesthetic", options1: ["Modern Minimalist", "Swiss International", "Bauhaus Functional", "Bold & Maximalist"],
+            label2: "Deliverable", options2: ["Brand Identity/Logo", "Landing Page Layout", "Social Media Suite", "Print Catalog"],
+            placeholder: "Describe the brand values and target demographic..."
+        },
+        "Communication Coach": {
+            label1: "Interaction Type", options1: ["Delivering Tough Feedback", "High-Stakes Salary Negotiation", "Public Keynote Speech", "Interpersonal Conflict"],
+            label2: "Desired Outcome", options2: ["Establish Authority", "Build Empathy", "De-escalate Tension", "Inspire Action"],
+            placeholder: "Describe the specific person or situation..."
+        },
+        "Market Analyst": {
+            label1: "Analysis Focus", options1: ["Competitor Benchmarking", "Consumer Sentiment", "Macro-Economic Trends", "Pricing Elasticity"],
+            label2: "Data Presentation", options2: ["Executive Summary", "Gaps Analysis Table", "Risk Matrix", "Forecast Model"],
+            placeholder: "Define the market segment or industry..."
+        },
+        "Talent Specialist": {
+            label1: "Focus Area", options1: ["Retention Strategy", "Executive Headhunting", "Performance Review Cycle", "Company Culture Alignment"],
+            label2: "Employee Lifecycle", options2: ["Pre-boarding/Hiring", "Development/Growth", "Exit Interviews", "Conflict Resolution"],
+            placeholder: "Describe the candidate profile or employee issue..."
+        },
+        "Data Analyst": {
+            label1: "Analysis Level", options1: ["Descriptive (What happened?)", "Diagnostic (Why?)", "Predictive (What's next?)", "Prescriptive (How to fix?)"],
+            label2: "Technical Focus", options2: ["Statistical Correlation", "Data Cleaning/ETL", "Visualization Storytelling", "Trend Identification"],
+            placeholder: "Describe the dataset and your business question..."
+        },
+        "Brand Content Specialist": {
+            label1: "Platform Focus", options1: ["LinkedIn Thought Leadership", "Email Newsletter", "Short-Form Video Script", "White Paper/Blog"],
+            label2: "Content Strategy", options2: ["Viral/Provocative", "Educational/Deep-Dive", "Emotional Storytelling", "Direct Conversion"],
+            placeholder: "What is the key message or 'Big Idea'?"
+        },
+        "Other": {
+            label1: "Manual Role Input", isInput: true,
+            label2: "Preferred Tone", options2: ["Professional", "Witty", "Direct", "Academic"],
+            placeholder: "What is the custom task you need help with?"
+        }
+    };
+
+    function updateUI() {
+        const role = document.getElementById('roleSelector').value;
+        const data = roleData[role];
+        const container = document.getElementById('dynamicFields');
+        
+        let field1HTML = `<div class="field-group"><label>${data.label1}</label>`;
+        if (data.isInput) {
+            field1HTML += `<input type="text" id="val1" oninput="generatePrompt()" placeholder="e.g. Architect"></div>`;
+        } else {
+            field1HTML += `<select id="val1" oninput="generatePrompt()">${data.options1.map(o => `<option value="${o}">${o}</option>`).join('')}</select></div>`;
+        }
+
+        let field2HTML = `<div class="field-group"><label>${data.label2}</label>
+            <select id="val2" oninput="generatePrompt()">${data.options2.map(o => `<option value="${o}">${o}</option>`).join('')}</select></div>`;
+
+        let contextHTML = `<div class="field-group"><label>Context / Details</label>
+            <textarea id="val3" rows="5" placeholder="${data.placeholder}" oninput="generatePrompt()"></textarea></div>`;
+
+        container.innerHTML = field1HTML + field2HTML + contextHTML;
+        generatePrompt();
+    }
+
     function generatePrompt() {
-        const obj = document.getElementById('objective').value;
-        const ctx = document.getElementById('context').value || "[Context]";
-        const frm = document.getElementById('framework').value;
-        const fullPrompt = `Act as a Senior Managing Partner at a top-tier global strategy consultancy. \n\nCONTEXT: ${ctx}\n\nTASK: Provide a high-level ${obj} using the ${frm}.\n\nCONSTRAINTS: \n- Use a Candid & Executive tone.\n- Prioritize EBITDA impact.\n- Structure for a Board audience.`;
-        document.getElementById('output').innerText = fullPrompt;
+        const role = document.getElementById('roleSelector').value;
+        const val1 = document.getElementById('val1').value;
+        const val2 = document.getElementById('val2').value;
+        const val3 = document.getElementById('val3').value || "...";
+        
+        let promptText = "";
+        if (role === "Other") {
+            promptText = `Act as an expert ${val1}. \n\nCONTEXT: ${val3}\n\nTASK: Handle this request using a ${val2} tone. Provide a detailed, high-quality response.`;
+        } else {
+            promptText = `Act as an elite ${role}. \n\nPRIMARY FOCUS: ${val1}\nCONTEXT: ${val3}\nFRAMEWORK/METHOD: ${val2}\n\nCONSTRAINTS:\n- Ensure the output is executive-grade.\n- Prioritize actionable insights and professional clarity.\n- Align with industry best practices for ${role}.`;
+        }
+        
+        document.getElementById('output').innerText = promptText;
     }
 
     function copyPrompt() {
         const text = document.getElementById('output').innerText;
         const btn = document.querySelector('.copy-btn');
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(() => showSuccess(btn)).catch(() => fallbackCopy(text, btn));
-        } else {
-            fallbackCopy(text, btn);
-        }
-    }
-
-    function fallbackCopy(text, btn) {
         const textArea = document.getElementById('tempCopyArea');
         textArea.value = text;
         textArea.select();
         document.execCommand('copy');
-        showSuccess(btn);
-    }
-
-    function showSuccess(btn) {
+        
         const originalText = btn.innerText;
         btn.innerText = "COPIED!";
         btn.style.backgroundColor = "#FFFFFF";
@@ -209,7 +212,8 @@
             btn.style.backgroundColor = "var(--accent)";
         }, 2000);
     }
-    window.onload = generatePrompt;
+
+    window.onload = updateUI;
 </script>
 </body>
 </html>
