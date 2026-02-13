@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy Consultant Prompt Generator</title>
+    <style>
+        :root {
+            --primary: #1F4F98;
+            --navy: #0C2867;
+            --accent: #F4C744;
+            --white: #FFFFFF;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; padding: 20px; color: var(--navy); }
+        .container { max-width: 800px; margin: 0 auto; background: var(--white); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
+        h1 { color: var(--navy); margin-bottom: 5px; }
+        p.subtitle { color: #666; margin-bottom: 25px; }
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.9rem; }
+        select, textarea, input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        .prompt-preview { margin-top: 30px; padding: 20px; background: #f9f9f9; border: 2px dashed var(--primary); border-radius: 8px; position: relative; }
+        .prompt-header { font-weight: bold; color: var(--primary); margin-bottom: 10px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        #output { white-space: pre-wrap; line-height: 1.5; color: #333; }
+        .copy-btn { margin-top: 20px; background-color: var(--accent); color: var(--navy); border: none; padding: 15px 30px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.3s; }
+        .copy-btn:hover { background-color: #e0b63d; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Strategic Consultant AI</h1>
+    <p class="subtitle">Generate high-level strategic frameworks for your business challenges.</p>
+
+    <label>What is your core objective?</label>
+    <select id="objective" oninput="generatePrompt()">
+        <option value="Market Entry Analysis">Market Entry Analysis</option>
+        <option value="Operational Efficiency Audit">Operational Efficiency Audit</option>
+        <option value="Competitive SWOT Analysis">Competitive SWOT Analysis</option>
+        <option value="Product-Market Fit Review">Product-Market Fit Review</option>
+    </select>
+
+    <label>The Context / Specific Challenge (What's happening?)</label>
+    <textarea id="context" rows="3" placeholder="e.g. Our revenue has plateaued in the mid-market segment despite high NPS scores..." oninput="generatePrompt()"></textarea>
+
+    <label>Desired Output Framework</label>
+    <select id="framework" oninput="generatePrompt()">
+        <option value="MECE Framework (Mutually Exclusive, Collectively Exhaustive)">MECE Framework</option>
+        <option value="Porter's Five Forces">Porter's Five Forces</option>
+        <option value="Blue Ocean Strategy">Blue Ocean Strategy</option>
+        <option value="Actionable 30-60-90 Day Plan">Actionable 30-60-90 Day Plan</option>
+    </select>
+
+    <label>Tone of Analysis</label>
+    <select id="tone" oninput="generatePrompt()">
+        <option value="Direct & Objective">Direct & Objective</option>
+        <option value="Visionary & Inspirational">Visionary & Inspirational</option>
+        <option value="Critical & Risk-Averse">Critical & Risk-Averse</option>
+    </select>
+
+    <div class="prompt-preview">
+        <div class="prompt-header">Your Tailored Prompt (Auto-populating)</div>
+        <div id="output">Please fill in the fields above to see your prompt...</div>
+    </div>
+
+    <button class="copy-btn" onclick="copyPrompt()">COPY PROMPT TO CLIPBOARD</button>
+</div>
+
+<script>
+    function generatePrompt() {
+        const objective = document.getElementById('objective').value;
+        const context = document.getElementById('context').value || "[Describe your challenge here]";
+        const framework = document.getElementById('framework').value;
+        const tone = document.getElementById('tone').value;
+
+        const fullPrompt = `Act as a Senior Strategy Consultant with 20 years of experience in ${objective}. 
+
+CORE CONTEXT: ${context}
+
+YOUR TASK: Analyze the situation above and provide a detailed strategic breakdown using the ${framework}. 
+
+CONSTRAINTS: 
+- Use a ${tone} tone.
+- Prioritize high-impact, low-effort wins.
+- Structure the response for an Executive audience (concise, data-driven, and actionable).`;
+
+        document.getElementById('output').innerText = fullPrompt;
+    }
+
+    function copyPrompt() {
+        const text = document.getElementById('output').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Prompt copied! You can now paste it into ChatGPT, Claude, or Gemini.");
+        });
+    }
+
+    // Initialize on load
+    window.onload = generatePrompt;
+</script>
+
+</body>
+</html>
