@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Role AI Prompt Generator</title>
+    <title>Executive Expert Prompt Generator</title>
     <style>
         :root {
             --primary: #1F4F98;
@@ -20,31 +20,40 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: var(--white); display: flex; justify-content: center; }
         
         .app-wrapper {
-            display: flex; flex-direction: row; gap: 20px; width: 95%; max-width: 1050px;
+            display: flex; flex-direction: row; gap: 20px; width: 95%; max-width: 1100px;
             height: 100vh; padding: 20px; box-sizing: border-box;
         }
 
         /* Scrollable Input Section */
         .input-section {
-            flex: 1; display: flex; flex-direction: column; gap: 15px;
-            overflow-y: auto; padding-bottom: 30px;
+            flex: 1.2; display: flex; flex-direction: column; gap: 15px;
+            overflow-y: auto; padding-bottom: 30px; padding-right: 15px;
         }
 
         /* Fixed Preview Section */
         .preview-section {
-            flex: 1; background: rgba(255, 255, 255, 0.08); padding: 20px;
+            flex: 0.8; background: rgba(255, 255, 255, 0.08); padding: 20px;
             border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex; flex-direction: column; height: calc(100% - 40px); box-sizing: border-box;
         }
 
         h2 { font-size: 1.4rem; margin: 0; color: var(--accent); }
-        .field-group { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; }
-        label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+        h3 { font-size: 0.9rem; margin: 15px 0 5px 0; color: var(--accent); border-bottom: 1px solid rgba(244, 199, 68, 0.2); padding-bottom: 3px; text-transform: uppercase; }
         
-        select, textarea, input { 
+        .field-group { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; }
+        .row-group { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        
+        label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; }
+        .hint { font-size: 0.7rem; opacity: 0.7; font-weight: normal; font-style: italic; }
+        
+        select, textarea, input[type="text"] { 
             width: 100%; padding: 10px; border: 1px solid rgba(255, 255, 255, 0.2); 
             border-radius: 6px; font-size: 0.9rem; background: var(--white); color: var(--navy); font-family: inherit;
         }
+
+        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+        .hidden-field { display: none; margin-top: 5px; }
 
         .prompt-header { 
             font-size: 0.7rem; font-weight: bold; color: var(--accent); 
@@ -63,9 +72,13 @@
         }
         .copy-btn:hover { background-color: #FFFFFF; }
 
+        /* Custom Scrollbar */
+        .input-section::-webkit-scrollbar, #output::-webkit-scrollbar { width: 6px; }
+        .input-section::-webkit-scrollbar-thumb, #output::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
         @media (max-width: 768px) {
             .app-wrapper { flex-direction: column; overflow-y: auto; height: auto; }
-            .preview-section { height: 350px; margin-top: 10px; flex: none; }
+            .preview-section { height: 400px; margin-top: 10px; flex: none; }
         }
     </style>
 </head>
@@ -73,127 +86,263 @@
 
 <div class="app-wrapper">
     <div class="input-section">
-        <h2>Role Expert AI</h2>
+        <h2>Expert Prompt Generator</h2>
         
         <div class="field-group">
-            <label>Select Expert Role</label>
-            <select id="roleSelector" onchange="updateUI()">
-                <option value="Management Consultant">Management Consultant</option>
-                <option value="Translator">Translator</option>
+            <label>Expert Role</label>
+            <select id="roleSelector" onchange="renderRoleUI()">
                 <option value="Film Director">Film Director</option>
-                <option value="Graphic Designer">Graphic Designer</option>
-                <option value="Communication Coach">Communication Coach</option>
-                <option value="Market Analyst">Market Analyst</option>
-                <option value="Talent Specialist">Talent Specialist</option>
-                <option value="Data Analyst">Data Analyst</option>
-                <option value="Brand Content Specialist">Brand Content Specialist</option>
-                <option value="Other">Other (Custom)</option>
+                <option value="Translator">Translator</option>
+                <option value="Management Consultant">Management Consultant</option>
+                <option value="Other">Other</option>
             </select>
         </div>
 
-        <div id="dynamicFields">
+        <div id="roleFields">
             </div>
     </div>
 
     <div class="preview-section">
-        <div class="prompt-header">Generated Expert Prompt</div>
-        <div id="output">Generating...</div>
-        <button class="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
+        <div class="prompt-header">Generated Prompt</div>
+        <div id="output">Fill the fields to generate your cinematic prompt...</div>
+        <button class="copy-btn" onclick="copyPrompt()">Copy to Clipboard</button>
     </div>
 </div>
 
 <textarea id="tempCopyArea" style="position:absolute; left:-9999px;"></textarea>
 
 <script>
-    const roleData = {
-        "Management Consultant": {
-            label1: "Strategic Objective", options1: ["Margin Expansion", "Market Entry", "M&A Integration", "Digital Transformation"],
-            label2: "Strategic Framework", options2: ["MECE Breakdown", "Porter's Five Forces", "The 3C’s Model", "SWOT Analysis"],
-            placeholder: "Describe the business friction or challenge..."
-        },
-        "Translator": {
-            label1: "Tone & Nuance", options1: ["Strictly Professional", "Creative/Idiomatic", "Technical/Legal", "Casual/Slang"],
-            label2: "Target Audience", options2: ["General Public", "Executive Board", "Local Community", "Academic Peers"],
-            placeholder: "Paste the text you need translated..."
-        },
-        "Film Director": {
-            label1: "Visual Style", options1: ["Cinematic/Anamorphic", "Gritty Documentary", "Neo-Noir High Contrast", "Whimsical/Bright"],
-            label2: "Scene Context", options2: ["Character Intro", "Action Sequence", "Tense Dialogue", "Atmospheric B-Roll"],
-            placeholder: "Describe the scene plot or script snippet..."
-        },
-        "Graphic Designer": {
-            label1: "Design Aesthetic", options1: ["Modern Minimalist", "Swiss International", "Bauhaus Functional", "Bold & Maximalist"],
-            label2: "Deliverable", options2: ["Brand Identity/Logo", "Landing Page Layout", "Social Media Suite", "Print Catalog"],
-            placeholder: "Describe the brand values and target demographic..."
-        },
-        "Communication Coach": {
-            label1: "Interaction Type", options1: ["Delivering Tough Feedback", "High-Stakes Salary Negotiation", "Public Keynote Speech", "Interpersonal Conflict"],
-            label2: "Desired Outcome", options2: ["Establish Authority", "Build Empathy", "De-escalate Tension", "Inspire Action"],
-            placeholder: "Describe the specific person or situation..."
-        },
-        "Market Analyst": {
-            label1: "Analysis Focus", options1: ["Competitor Benchmarking", "Consumer Sentiment", "Macro-Economic Trends", "Pricing Elasticity"],
-            label2: "Data Presentation", options2: ["Executive Summary", "Gaps Analysis Table", "Risk Matrix", "Forecast Model"],
-            placeholder: "Define the market segment or industry..."
-        },
-        "Talent Specialist": {
-            label1: "Focus Area", options1: ["Retention Strategy", "Executive Headhunting", "Performance Review Cycle", "Company Culture Alignment"],
-            label2: "Employee Lifecycle", options2: ["Pre-boarding/Hiring", "Development/Growth", "Exit Interviews", "Conflict Resolution"],
-            placeholder: "Describe the candidate profile or employee issue..."
-        },
-        "Data Analyst": {
-            label1: "Analysis Level", options1: ["Descriptive (What happened?)", "Diagnostic (Why?)", "Predictive (What's next?)", "Prescriptive (How to fix?)"],
-            label2: "Technical Focus", options2: ["Statistical Correlation", "Data Cleaning/ETL", "Visualization Storytelling", "Trend Identification"],
-            placeholder: "Describe the dataset and your business question..."
-        },
-        "Brand Content Specialist": {
-            label1: "Platform Focus", options1: ["LinkedIn Thought Leadership", "Email Newsletter", "Short-Form Video Script", "White Paper/Blog"],
-            label2: "Content Strategy", options2: ["Viral/Provocative", "Educational/Deep-Dive", "Emotional Storytelling", "Direct Conversion"],
-            placeholder: "What is the key message or 'Big Idea'?"
-        },
-        "Other": {
-            label1: "Manual Role Input", isInput: true,
-            label2: "Preferred Tone", options2: ["Professional", "Witty", "Direct", "Academic"],
-            placeholder: "What is the custom task you need help with?"
-        }
-    };
-
-    function updateUI() {
-        const role = document.getElementById('roleSelector').value;
-        const data = roleData[role];
-        const container = document.getElementById('dynamicFields');
-        
-        let field1HTML = `<div class="field-group"><label>${data.label1}</label>`;
-        if (data.isInput) {
-            field1HTML += `<input type="text" id="val1" oninput="generatePrompt()" placeholder="e.g. Architect"></div>`;
+    // Utility to toggle visibility based on "Other" or "Yes"
+    function toggleOther(selectId, targetId) {
+        const select = document.getElementById(selectId);
+        const target = document.getElementById(targetId);
+        if (select.value === "Other" || (select.type === "checkbox" && select.checked)) {
+            target.style.display = "block";
         } else {
-            field1HTML += `<select id="val1" oninput="generatePrompt()">${data.options1.map(o => `<option value="${o}">${o}</option>`).join('')}</select></div>`;
+            target.style.display = "none";
         }
+        generatePrompt();
+    }
 
-        let field2HTML = `<div class="field-group"><label>${data.label2}</label>
-            <select id="val2" oninput="generatePrompt()">${data.options2.map(o => `<option value="${o}">${o}</option>`).join('')}</select></div>`;
+    function renderRoleUI() {
+        const role = document.getElementById('roleSelector').value;
+        const container = document.getElementById('roleFields');
+        
+        if (role === "Film Director") {
+            container.innerHTML = `
+                <h3>Cinematography</h3>
+                <div class="field-group">
+                    <label>Shot Type / Angle</label>
+                    <select id="shotType" onchange="toggleOther('shotType', 'shotTypeOther')">
+                        <option value="Wide Shot (Establishing context)">Wide Shot (Establishing context)</option>
+                        <option value="Medium Shot (Standard interaction)">Medium Shot (Standard interaction)</option>
+                        <option value="Close-up (Emotional impact)">Close-up (Emotional impact)</option>
+                        <option value="Low Angle (Power/Authority)">Low Angle (Power/Authority)</option>
+                        <option value="High Angle (Overview/Vulnerability)">High Angle (Overview/Vulnerability)</option>
+                        <option value="Bird’s Eye View (Strategy/Scale)">Bird’s Eye View (Strategy/Scale)</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="shotTypeOther" class="hidden-field" placeholder="Specify custom angle..." oninput="generatePrompt()">
+                </div>
 
-        let contextHTML = `<div class="field-group"><label>Context / Details</label>
-            <textarea id="val3" rows="5" placeholder="${data.placeholder}" oninput="generatePrompt()"></textarea></div>`;
+                <div class="row-group">
+                    <input type="checkbox" id="camMoveCheck" onchange="toggleOther('camMoveCheck', 'camMoveInput')">
+                    <label>Include Camera Movement?</label>
+                </div>
+                <div id="camMoveInput" class="hidden-field">
+                    <input type="text" id="camMoveText" placeholder="Specify movement (e.g. Slow push in, Tracking shot...)" oninput="generatePrompt()">
+                </div>
 
-        container.innerHTML = field1HTML + field2HTML + contextHTML;
+                <h3>Subject & Action</h3>
+                <div class="field-group">
+                    <label>Who/What - Action - Expression</label>
+                    <span class="hint">[Who/What] - [Specific action] - [Expressions/gestures]</span>
+                    <textarea id="subjectAction" rows="3" placeholder="e.g. CEO - Standing at window - Looking determined..." oninput="generatePrompt()"></textarea>
+                </div>
+
+                <h3>Environment</h3>
+                <div class="field-group">
+                    <label>Setting</label>
+                    <select id="setting" onchange="toggleOther('setting', 'settingOther')">
+                        <option value="Minimalist Executive Suite">Minimalist Executive Suite</option>
+                        <option value="High-tech Innovation Lab">High-tech Innovation Lab</option>
+                        <option value="Futuristic Urban Skyline">Futuristic Urban Skyline</option>
+                        <option value="Sustainable Green Campus">Sustainable Green Campus</option>
+                        <option value="Industrial Factory Floor">Industrial Factory Floor</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="settingOther" class="hidden-field" placeholder="Specify custom setting..." oninput="generatePrompt()">
+                </div>
+
+                <div class="field-group">
+                    <label>Time of Day</label>
+                    <select id="timeOfDay" onchange="toggleOther('timeOfDay', 'timeOther')">
+                        <option value="Golden Hour (Warm/Aspirational)">Golden Hour (Warm/Aspirational)</option>
+                        <option value="Blue Hour (Cool/Sleek)">Blue Hour (Cool/Sleek)</option>
+                        <option value="High Noon (Clear/Direct)">High Noon (Clear/Direct)</option>
+                        <option value="Night/Neon (Modern/Tech-focused)">Night/Neon (Modern/Tech-focused)</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="timeOther" class="hidden-field" placeholder="Specify custom time..." oninput="generatePrompt()">
+                </div>
+
+                <div class="field-group">
+                    <label>Background Details</label>
+                    <input type="text" id="bgDetails" placeholder="e.g. Floating data holograms, blurred city lights..." oninput="generatePrompt()">
+                </div>
+
+                <h3>Style & Ambiance</h3>
+                <div class="field-group">
+                    <label>Aesthetic / Film Genre</label>
+                    <select id="aesthetic" onchange="toggleOther('aesthetic', 'aestheticOther')">
+                        <option value="Cinematic Blockbuster">Cinematic Blockbuster</option>
+                        <option value="Minimalist Tech">Minimalist Tech</option>
+                        <option value="Corporate Noir">Corporate Noir</option>
+                        <option value="National Geographic Documentary">National Geographic Documentary</option>
+                        <option value="Retro-Futurism">Retro-Futurism</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="aestheticOther" class="hidden-field" placeholder="Specify custom genre..." oninput="generatePrompt()">
+                </div>
+
+                <div class="field-group">
+                    <label>Lighting Style</label>
+                    <select id="lighting" onchange="toggleOther('lighting', 'lightingOther')">
+                        <option value="Rembrandt Lighting (Classic/Moody)">Rembrandt Lighting (Classic/Moody)</option>
+                        <option value="Softbox (Clean/Professional)">Softbox (Clean/Professional)</option>
+                        <option value="High-Key (Bright/Optimistic)">High-Key (Bright/Optimistic)</option>
+                        <option value="Volumetric Lighting (Dramatic light beams)">Volumetric Lighting (Dramatic light beams)</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="lightingOther" class="hidden-field" placeholder="Specify custom lighting..." oninput="generatePrompt()">
+                </div>
+
+                <div class="field-group">
+                    <label>Color Palette</label>
+                    <select id="color" onchange="toggleOther('color', 'colorOther')">
+                        <option value="Teal and Orange (Modern Cinema)">Teal and Orange (Modern Cinema)</option>
+                        <option value="Monochrome/Grayscale (Sophisticated)">Monochrome/Grayscale (Sophisticated)</option>
+                        <option value="Deep Blues & Silvers (Trust/Tech)">Deep Blues & Silvers (Trust/Tech)</option>
+                        <option value="Earth Tones (Sustainability/Human)">Earth Tones (Sustainability/Human)</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="colorOther" class="hidden-field" placeholder="Specify custom colors..." oninput="generatePrompt()">
+                </div>
+
+                <h3>Audio</h3>
+                <div class="row-group">
+                    <input type="checkbox" id="audioCheck" onchange="toggleOther('audioCheck', 'audioFields')">
+                    <label>Include Audio Specifications?</label>
+                </div>
+                <div id="audioFields" class="hidden-field">
+                    <div class="field-group">
+                        <label>Dialogue</label>
+                        <select id="dialogue" onchange="toggleOther('dialogue', 'dialogueOther')">
+                            <option value="Internal Monologue (Voiceover)">Internal Monologue (Voiceover)</option>
+                            <option value="Direct Address (Breaking the 4th wall)">Direct Address (Breaking the 4th wall)</option>
+                            <option value="Muffled background chatter">Muffled background chatter</option>
+                            <option value="No dialogue (Visual story)">No dialogue (Visual story)</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="dialogueOther" class="hidden-field" placeholder="Specify dialogue style..." oninput="generatePrompt()">
+                    </div>
+                    <div class="field-group">
+                        <label>Ambient Noises</label>
+                        <select id="ambient" onchange="toggleOther('ambient', 'ambientOther')">
+                            <option value="Low hum of technology">Low hum of technology</option>
+                            <option value="City soundscape">City soundscape</option>
+                            <option value="Soft wind/Nature">Soft wind/Nature</option>
+                            <option value="Echoing footsteps">Echoing footsteps</option>
+                            <option value="Indistinct office bustle">Indistinct office bustle</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="ambientOther" class="hidden-field" placeholder="Specify ambient sound..." oninput="generatePrompt()">
+                    </div>
+                    <div class="field-group">
+                        <label>Music / SFX</label>
+                        <select id="music" onchange="toggleOther('music', 'musicOther')">
+                            <option value="Uplifting Orchestral">Uplifting Orchestral</option>
+                            <option value="Minimalist Synth">Minimalist Synth</option>
+                            <option value="Lo-fi Beats">Lo-fi Beats</option>
+                            <option value="Deep Bass Thrum">Deep Bass Thrum</option>
+                            <option value="Rhythmic ticking (Urgency)">Rhythmic ticking (Urgency)</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="musicOther" class="hidden-field" placeholder="Specify music style..." oninput="generatePrompt()">
+                    </div>
+                </div>
+
+                <h3>Negative Prompt (Exclusions)</h3>
+                <div class="row-group"><input type="checkbox" class="neg-check" value="subtitles" onchange="generatePrompt()"><label>No Subtitles</label></div>
+                <div class="row-group"><input type="checkbox" class="neg-check" value="text" onchange="generatePrompt()"><label>No Text</label></div>
+                <div class="row-group"><input type="checkbox" class="neg-check" value="watermarks" onchange="generatePrompt()"><label>No Watermarks</label></div>
+                <div class="row-group"><input type="checkbox" class="neg-check" value="distorted faces" onchange="generatePrompt()"><label>No Distorted Faces</label></div>
+                <div class="row-group">
+                    <input type="checkbox" id="negOtherCheck" onchange="toggleOther('negOtherCheck', 'negOtherInput')">
+                    <label>Other Exclusion</label>
+                </div>
+                <div id="negOtherInput" class="hidden-field">
+                    <input type="text" id="negOtherText" placeholder="Specify other exclusions..." oninput="generatePrompt()">
+                </div>
+            `;
+        } else {
+            container.innerHTML = `<p>Role logic coming soon...</p>`;
+        }
         generatePrompt();
     }
 
     function generatePrompt() {
         const role = document.getElementById('roleSelector').value;
-        const val1 = document.getElementById('val1').value;
-        const val2 = document.getElementById('val2').value;
-        const val3 = document.getElementById('val3').value || "...";
-        
-        let promptText = "";
-        if (role === "Other") {
-            promptText = `Act as an expert ${val1}. \n\nCONTEXT: ${val3}\n\nTASK: Handle this request using a ${val2} tone. Provide a detailed, high-quality response.`;
-        } else {
-            promptText = `Act as an elite ${role}. \n\nPRIMARY FOCUS: ${val1}\nCONTEXT: ${val3}\nFRAMEWORK/METHOD: ${val2}\n\nCONSTRAINTS:\n- Ensure the output is executive-grade.\n- Prioritize actionable insights and professional clarity.\n- Align with industry best practices for ${role}.`;
+        if (role !== "Film Director") {
+            document.getElementById('output').innerText = "Select Film Director to see the logic.";
+            return;
         }
-        
-        document.getElementById('output').innerText = promptText;
+
+        // Helper to get value or "Other" text
+        const getVal = (id, otherId) => {
+            const base = document.getElementById(id).value;
+            if (base === "Other") return document.getElementById(otherId).value || "[Custom]";
+            return base;
+        };
+
+        const shot = getVal('shotType', 'shotTypeOther');
+        const camMove = document.getElementById('camMoveCheck').checked ? document.getElementById('camMoveText').value : "Static";
+        const subAction = document.getElementById('subjectAction').value || "[Describe the action]";
+        const set = getVal('setting', 'settingOther');
+        const tod = getVal('timeOfDay', 'timeOther');
+        const bg = document.getElementById('bgDetails').value || "Standard environment details";
+        const aesthetic = getVal('aesthetic', 'aestheticOther');
+        const lighting = getVal('lighting', 'lightingOther');
+        const color = getVal('color', 'colorOther');
+
+        let audioSection = "";
+        if (document.getElementById('audioCheck').checked) {
+            audioSection = `\n\nAUDIO LAYERS:\n- Dialogue: ${getVal('dialogue', 'dialogueOther')}\n- Ambience: ${getVal('ambient', 'ambientOther')}\n- Music/SFX: ${getVal('music', 'musicOther')}`;
+        }
+
+        let negList = [];
+        document.querySelectorAll('.neg-check:checked').forEach(c => negList.push(c.value));
+        if (document.getElementById('negOtherCheck').checked) negList.push(document.getElementById('negOtherText').value);
+        let negativePrompt = negList.length > 0 ? `\n\nNEGATIVE PROMPT (DO NOT INCLUDE): ${negList.join(', ')}` : "";
+
+        const fullPrompt = `Act as a world-class Film Director. Create a high-fidelity visual scene description with the following specs:
+
+VISUAL COMPOSITION:
+- Shot & Angle: ${shot}
+- Camera Movement: ${camMove}
+- Aesthetic Style: ${aesthetic}
+
+SUBJECT & ENVIRONMENT:
+- Subject Action: ${subAction}
+- Setting: ${set}
+- Time of Day: ${tod}
+- Background Details: ${bg}
+
+LIGHTING & COLOR:
+- Lighting Style: ${lighting}
+- Color Grade: ${color}${audioSection}${negativePrompt}`;
+
+        document.getElementById('output').innerText = fullPrompt;
     }
 
     function copyPrompt() {
@@ -204,16 +353,16 @@
         textArea.select();
         document.execCommand('copy');
         
-        const originalText = btn.innerText;
         btn.innerText = "COPIED!";
         btn.style.backgroundColor = "#FFFFFF";
         setTimeout(() => { 
-            btn.innerText = originalText; 
+            btn.innerText = "COPY TO CLIPBOARD"; 
             btn.style.backgroundColor = "var(--accent)";
         }, 2000);
     }
 
-    window.onload = updateUI;
+    window.onload = renderRoleUI;
 </script>
+
 </body>
 </html>
