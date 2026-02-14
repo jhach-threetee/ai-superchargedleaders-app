@@ -91,6 +91,7 @@
                 <option value="Film Director">Film Director</option>
                 <option value="Translator">Translator</option>
                 <option value="Management Consultant">Management Consultant</option>
+                <option value="Talent Acquisition Specialist">Talent Acquisition Specialist</option>
                 <option value="Other">Other (General Purpose)</option>
             </select>
         </div>
@@ -129,20 +130,14 @@
         const frameworkSel = document.getElementById('mcFramework');
         const condSection = document.getElementById('mcConditionalFields');
         if(!frameworkSel || !condSection) return;
-        
         let options = [];
         let condHTML = "";
-
         if (obj === "Market Analysis") {
             options = ["Porter's Five Forces", "PESTEL Analysis", "SWOT Analysis", "Consumer Persona Profile"];
-            condHTML = `
-                <div class="field-group"><label id="labelCond1">Competitive Landscape</label><textarea id="mcCond1" rows="2" placeholder="List top competitors..." oninput="generatePrompt()"></textarea></div>
-                <div class="field-group"><label id="labelCond2">Target Demographics</label><textarea id="mcCond2" rows="2" placeholder="Detail demographic profiles..." oninput="generatePrompt()"></textarea></div>`;
+            condHTML = `<div class="field-group"><label id="labelCond1">Competitive Landscape</label><textarea id="mcCond1" rows="2" placeholder="List top competitors..." oninput="generatePrompt()"></textarea></div><div class="field-group"><label id="labelCond2">Target Demographics</label><textarea id="mcCond2" rows="2" placeholder="Detail demographic profiles..." oninput="generatePrompt()"></textarea></div>`;
         } else if (obj === "Profitability") {
             options = ["Profit Tree (Revenue/Cost)", "Value Chain Analysis", "EBITDA Lever Map"];
-            condHTML = `
-                <div class="field-group"><label id="labelCond1">Revenue Streams</label><input type="text" id="mcCond1" placeholder="e.g. SaaS, Hardware..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label id="labelCond2">Cost Structure</label><input type="text" id="mcCond2" placeholder="Fixed vs Variable..." oninput="generatePrompt()"></div>`;
+            condHTML = `<div class="field-group"><label id="labelCond1">Revenue Streams</label><input type="text" id="mcCond1" placeholder="e.g. SaaS, Hardware..." oninput="generatePrompt()"></div><div class="field-group"><label id="labelCond2">Cost Structure</label><input type="text" id="mcCond2" placeholder="Fixed vs Variable..." oninput="generatePrompt()"></div>`;
         } else if (obj === "Market Entry") {
             options = ["3C’s Model", "Ansoff Matrix", "Blue Ocean Strategy"];
             condHTML = `<div class="field-group"><label id="labelCond1">Barriers to Entry</label><input type="text" id="mcCond1" placeholder="Regulatory, Capital..." oninput="generatePrompt()"></div>`;
@@ -150,7 +145,6 @@
             options = ["McKinsey 7-S Framework", "Lean Six Sigma Map", "Process Bottleneck Analysis"];
             condHTML = `<div class="field-group"><label id="labelCond1">Known Bottlenecks</label><textarea id="mcCond1" rows="2" placeholder="e.g. Legacy systems..." oninput="generatePrompt()"></textarea></div>`;
         }
-
         frameworkSel.innerHTML = options.map(o => `<option value="${o}">${o}</option>`).join('') + `<option value="Other">Other</option>`;
         condSection.innerHTML = condHTML;
         generatePrompt();
@@ -167,15 +161,15 @@
                 <div class="row-group"><input type="checkbox" id="camMoveCheck" onchange="toggleField('camMoveCheck', 'camMoveInput')"><label>Include Camera Movement?</label></div>
                 <div id="camMoveInput" class="hidden-field"><input type="text" id="camMoveText" placeholder="e.g. Slow Dolly Zoom..." oninput="generatePrompt()"></div>
                 <h3>Subject & Action</h3>
-                <div class="field-group"><label>Subject Description</label><span class="hint">[Who/What] - [Specific action] - [Expressions/gestures]</span><textarea id="subjectAction" rows="3" placeholder="CEO - Standing at window - Looking determined..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Subject Description</label><span class="hint">[Who/What] - [Specific action] - [Expressions/gestures]</span><textarea id="subjectAction" rows="3" placeholder="CEO - Standing at window..." oninput="generatePrompt()"></textarea></div>
                 <h3>Environment</h3>
                 <div class="field-group"><label>Setting</label><select id="setting" onchange="toggleSelectOther('setting', 'settingOther')"><option value="Minimalist Executive Suite">Minimalist Executive Suite</option><option value="High-tech Innovation Lab">High-tech Innovation Lab</option><option value="Futuristic Urban Skyline">Futuristic Urban Skyline</option><option value="Sustainable Green Campus">Sustainable Green Campus</option><option value="Industrial Factory Floor">Industrial Factory Floor</option><option value="Other">Other</option></select><input type="text" id="settingOther" class="hidden-field" placeholder="Specify setting..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label>Time of Day</label><select id="timeOfDay" onchange="toggleSelectOther('timeOfDay', 'timeOther')"><option value="Golden Hour (Warm/Aspirational)">Golden Hour</option><option value="Blue Hour (Cool/Sleek)">Blue Hour</option><option value="High Noon (Clear/Direct)">High Noon</option><option value="Night/Neon (Modern/Tech-focused)">Night/Neon</option><option value="Other">Other</option></select><input type="text" id="timeOther" class="hidden-field" placeholder="Specify custom time..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label>Background Details</label><input type="text" id="bgDetails" placeholder="e.g. Floating data holograms..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label>Time of Day</label><select id="timeOfDay" onchange="toggleSelectOther('timeOfDay', 'timeOther')"><option value="Golden Hour">Golden Hour</option><option value="Blue Hour">Blue Hour</option><option value="High Noon">High Noon</option><option value="Night/Neon">Night/Neon</option><option value="Other">Other</option></select><input type="text" id="timeOther" class="hidden-field" placeholder="Specify custom time..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label>Background Details</label><input type="text" id="bgDetails" placeholder="Details..." oninput="generatePrompt()"></div>
                 <h3>Style & Ambiance</h3>
-                <div class="field-group"><label>Aesthetic / Film Genre</label><select id="aesthetic" onchange="toggleSelectOther('aesthetic', 'aestheticOther')"><option value="Cinematic Blockbuster">Cinematic Blockbuster</option><option value="Minimalist Tech">Minimalist Tech</option><option value="Corporate Noir">Corporate Noir</option><option value="National Geographic Documentary">National Geographic Documentary</option><option value="Retro-Futurism">Retro-Futurism</option><option value="Other">Other</option></select><input type="text" id="aestheticOther" class="hidden-field" placeholder="Specify custom genre..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label>Lighting Style</label><select id="lighting" onchange="toggleSelectOther('lighting', 'lightingOther')"><option value="Rembrandt Lighting (Classic/Moody)">Rembrandt</option><option value="Softbox (Clean/Professional)">Softbox</option><option value="High-Key (Bright/Optimistic)">High-Key</option><option value="Volumetric Lighting (Dramatic beams)">Volumetric</option><option value="Other">Other</option></select><input type="text" id="lightingOther" class="hidden-field" placeholder="Specify lighting..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label>Color Palette</label><select id="color" onchange="toggleSelectOther('color', 'colorOther')"><option value="Teal and Orange (Modern Cinema)">Teal and Orange</option><option value="Monochrome/Grayscale (Sophisticated)">Monochrome</option><option value="Deep Blues & Silvers (Trust/Tech)">Deep Blues & Silvers</option><option value="Earth Tones (Sustainability/Human)">Earth Tones</option><option value="Other">Other</option></select><input type="text" id="colorOther" class="hidden-field" placeholder="Specify custom colors..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label>Aesthetic / Genre</label><select id="aesthetic" onchange="toggleSelectOther('aesthetic', 'aestheticOther')"><option value="Cinematic Blockbuster">Cinematic Blockbuster</option><option value="Minimalist Tech">Minimalist Tech</option><option value="Corporate Noir">Corporate Noir</option><option value="National Geographic Documentary">National Geographic Documentary</option><option value="Retro-Futurism">Retro-Futurism</option><option value="Other">Other</option></select><input type="text" id="aestheticOther" class="hidden-field" placeholder="Genre..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label>Lighting Style</label><select id="lighting" onchange="toggleSelectOther('lighting', 'lightingOther')"><option value="Rembrandt Lighting">Rembrandt</option><option value="Softbox">Softbox</option><option value="High-Key">High-Key</option><option value="Volumetric">Volumetric</option><option value="Other">Other</option></select><input type="text" id="lightingOther" class="hidden-field" placeholder="Lighting..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label>Color Palette</label><select id="color" onchange="toggleSelectOther('color', 'colorOther')"><option value="Teal and Orange">Teal and Orange</option><option value="Monochrome">Monochrome</option><option value="Deep Blues & Silvers">Deep Blues & Silvers</option><option value="Earth Tones">Earth Tones</option><option value="Other">Other</option></select><input type="text" id="colorOther" class="hidden-field" placeholder="Color..." oninput="generatePrompt()"></div>
                 <h3>Audio (Optional)</h3>
                 <div class="row-group"><input type="checkbox" id="audioCheck" onchange="toggleField('audioCheck', 'audioFields')"><label>Include Audio?</label></div>
                 <div id="audioFields" class="hidden-field">
@@ -225,19 +219,72 @@
                 <h3>Output Settings</h3>
                 <div class="field-group"><label>Target Deliverable</label><select id="mcDeliverable" onchange="toggleSelectOther('mcDeliverable', 'mcDeliverableOther')"><option value="Executive Memo (1-page)">Executive Memo (1-page)</option><option value="Board Presentation Outline">Board Presentation Outline</option><option value="1-year and 5-year plan">1-year and 5-year plan</option><option value="30-60-90 Day Roadmap">30-60-90 Day Roadmap</option><option value="Risk Assessment Matrix">Risk Assessment Matrix</option><option value="Other">Other</option></select><input type="text" id="mcDeliverableOther" class="hidden-field" placeholder="Custom deliverable..." oninput="generatePrompt()"></div>`;
             updateConsultantFrameworks();
+        } else if (role === "Talent Acquisition Specialist") {
+            container.innerHTML = `
+                <h3>Position Fundamentals</h3>
+                <div class="field-group"><label>Job Title</label><input type="text" id="taJobTitle" placeholder="e.g. Chief Technology Officer" oninput="generatePrompt()"></div>
+                <div class="field-group"><label>Seniority Level</label><select id="taSeniority" onchange="generatePrompt()"><option value="Entry">Entry</option><option value="Mid-Level">Mid-Level</option><option value="Senior">Senior</option><option value="Director">Director</option><option value="C-Suite">C-Suite</option></select></div>
+                <div class="field-group"><label>Industry / Domain</label><input type="text" id="taIndustry" placeholder="e.g. Web3 Fintech, Biotech" oninput="generatePrompt()"></div>
+
+                <h3>The Mandate</h3>
+                <div class="field-group">
+                    <label>Primary Objective</label>
+                    <select id="taObjective" onchange="toggleSelectOther('taObjective', 'taObjectiveOther')">
+                        <option value="Create High-Impact Job Description">Create High-Impact Job Description</option>
+                        <option value="Draft Executive Outreach (Headhunting)">Draft Executive Outreach (Headhunting)</option>
+                        <option value="Generate Candidate Evaluation Rubric">Generate Candidate Evaluation Rubric</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="taObjectiveOther" class="hidden-field" placeholder="Specify custom mandate..." oninput="generatePrompt()">
+                </div>
+
+                <h3>DNA & Context</h3>
+                <div class="field-group"><label>Must-Have Qualifications</label><textarea id="taQuals" rows="3" placeholder="e.g. Expertise in AWS architecture, track record of IPO exit..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group">
+                    <label>Company Culture</label>
+                    <select id="taCulture" onchange="toggleSelectOther('taCulture', 'taCultureOther')">
+                        <option value="High-Growth & Agile">High-Growth & Agile</option>
+                        <option value="Corporate & Structured">Corporate & Structured</option>
+                        <option value="Mission-Driven & Impactful">Mission-Driven & Impactful</option>
+                        <option value="Creative & Experimental">Creative & Experimental</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="taCultureOther" class="hidden-field" placeholder="Describe culture..." oninput="generatePrompt()">
+                </div>
+
+                <div class="checkbox-grid">
+                    <div class="checkbox-item"><input type="checkbox" id="checkComp" onchange="toggleField('checkComp', 'inputComp')"><label>Compensation</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="checkLoc" onchange="toggleField('checkLoc', 'inputLoc')"><label>Location</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="checkExtra" onchange="toggleField('checkExtra', 'inputExtra')"><label>Extra Info</label></div>
+                </div>
+                <input type="text" id="inputComp" class="hidden-field" placeholder="e.g. $150k - $180k" oninput="generatePrompt()">
+                <input type="text" id="inputLoc" class="hidden-field" placeholder="e.g. Hybrid - NYC" oninput="generatePrompt()">
+                <textarea id="inputExtra" class="hidden-field" rows="2" placeholder="Anything else the AI should know?..." oninput="generatePrompt()"></textarea>
+
+                <h3>Output Style</h3>
+                <div class="field-group">
+                    <label>Recruitment Tone</label>
+                    <select id="taTone" onchange="toggleSelectOther('taTone', 'taToneOther')">
+                        <option value="Professional & Authoritative">Professional & Authoritative</option>
+                        <option value="Welcoming & Human-Centric">Welcoming & Human-Centric</option>
+                        <option value="Direct & Performance-Oriented">Direct & Performance-Oriented</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="taToneOther" class="hidden-field" placeholder="Custom tone..." oninput="generatePrompt()">
+                </div>`;
         } else if (role === "Other") {
             container.innerHTML = `
                 <h3>The Fundamentals</h3>
                 <div class="field-group"><label>Acting Role</label><input type="text" id="customRole" placeholder="e.g. Senior VP of Sales..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label>Context</label><textarea id="customContext" rows="3" placeholder="Describe the situation..." oninput="generatePrompt()"></textarea></div>
-                <div class="field-group"><label>Task</label><textarea id="customTask" rows="3" placeholder="Specific action to take..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Context</label><textarea id="customContext" rows="3" placeholder="Describe situation..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Task</label><textarea id="customTask" rows="3" placeholder="Specific action..." oninput="generatePrompt()"></textarea></div>
                 <h3>Strategic Levers (Optional)</h3>
                 <div class="row-group"><input type="checkbox" id="checkAudience" onchange="toggleField('checkAudience', 'inputAudience')"><label>Target Audience</label></div>
                 <input type="text" id="inputAudience" class="hidden-field" placeholder="Who is the end user?" oninput="generatePrompt()">
                 <div class="row-group"><input type="checkbox" id="checkConstraints" onchange="toggleField('checkConstraints', 'inputConstraints')"><label>Constraints</label></div>
                 <input type="text" id="inputConstraints" class="hidden-field" placeholder="No-go zones..." oninput="generatePrompt()">
                 <div class="row-group"><input type="checkbox" id="checkFormat" onchange="toggleField('checkFormat', 'inputFormat')"><label>Format</label></div>
-                <input type="text" id="inputFormat" class="hidden-field" placeholder="Table, List, Summary..." oninput="generatePrompt()">
+                <input type="text" id="inputFormat" class="hidden-field" placeholder="Table, List..." oninput="generatePrompt()">
                 <div class="row-group"><input type="checkbox" id="checkTone" onchange="toggleField('checkTone', 'inputTone')"><label>Tone</label></div>
                 <input type="text" id="inputTone" class="hidden-field" placeholder="Emotional frequency..." oninput="generatePrompt()">`;
         }
@@ -261,7 +308,7 @@
             if (isC('checkConstraints')) p += `\n\nCONSTRAINTS: ${getV('inputConstraints')}`;
         } else if (role === "Translator") {
             p = `Act as a master Localization Expert and Translator. Translate from ${getV('sourceLang') || "[Source]"} to ${getV('targetLang') || "[Target]"}.\n\nSPECIFICATIONS:\n- Tone: ${gS('transTone', 'transToneOther')}\n- Material: ${gS('transMaterial', 'transMaterialOther')}\n- Context: ${getV('transContext')}`;
-            if (isC('checkNuance')) p += `\n\nINSTRUCTION: Provide a brief Cultural Nuance Report.`;
+            if (isC('checkNuance')) p += `\n\nINSTRUCTION: Provide a brief Cultural Nuance Report after translation.`;
             if (isC('checkProtect')) p += `\n\nPROTECTED TERMS (DO NOT TRANSLATE): ${getV('inputProtect')}`;
             p += `\n\nSOURCE TEXT:\n"""\n${getV('transSource') || "[Paste text here]"}\n"""`;
         } else if (role === "Film Director") {
@@ -272,25 +319,22 @@
             const obj = getV('mcObjective');
             const frm = gS('mcFramework', 'mcFrameworkOther');
             const deliver = gS('mcDeliverable', 'mcDeliverableOther');
-            const cond1 = getV('mcCond1');
-            const cond2 = getV('mcCond2');
+            const cond1 = getV('mcCond1'); const cond2 = getV('mcCond2');
             const label1 = document.getElementById('labelCond1') ? document.getElementById('labelCond1').innerText : "";
             const label2 = document.getElementById('labelCond2') ? document.getElementById('labelCond2').innerText : "";
-
-            const taskMap = { 
-                "Market Analysis": "Analyze the current market landscape to identify growth opportunities and competitive threats.", 
-                "Profitability": "Perform a deep-dive profitability analysis to identify margin expansion levers and cost-saving opportunities.", 
-                "Market Entry": "Develop a comprehensive market entry strategy to ensure a successful and scalable launch.", 
-                "Operational Excellence": "Review current operations to optimize processes, remove bottlenecks, and improve organizational efficiency." 
-            };
-
+            const taskMap = { "Market Analysis": "Analyze the current market landscape to identify growth opportunities and competitive threats.", "Profitability": "Perform a deep-dive profitability analysis to identify margin expansion levers and cost-saving opportunities.", "Market Entry": "Develop a comprehensive market entry strategy to ensure a successful and scalable launch.", "Operational Excellence": "Review current operations to optimize processes, remove bottlenecks, and improve organizational efficiency." };
             const taskInstruction = isC('checkCustomTask') ? getV('mcCustomTaskText') : (taskMap[obj] || "Provide strategic recommendations.");
-
             p = `Act as a Managing Partner at a top-tier global strategy consultancy.\n\nBUSINESS PROBLEM: \n${getV('mcContext') || "[No Context Provided]"}\n\nSTRATEGIC FOCUS:\n- Objective: ${obj}\n- Framework: ${frm}`;
-            if (cond1) p += `\n- ${label1}: ${cond1}`;
-            if (cond2) p += `\n- ${label2}: ${cond2}`;
-            
+            if (cond1) p += `\n- ${label1}: ${cond1}`; if (cond2) p += `\n- ${label2}: ${cond2}`;
             p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant (Mutually Exclusive, Collectively Exhaustive).`;
+        } else if (role === "Talent Acquisition Specialist") {
+            const obj = gS('taObjective', 'taObjectiveOther');
+            const taskInstruction = { "Create High-Impact Job Description": "Write a compelling, professional job description that attracts top-tier talent while filtering for the specified DNA.", "Draft Executive Outreach (Headhunting)": "Draft a persuasive, personalized outreach message for a headhunting campaign targeting high-level passive candidates.", "Generate Candidate Evaluation Rubric": "Design a structured candidate evaluation scorecard and behavioral interview rubric to ensure objective hiring." }[obj] || "Optimize the talent acquisition strategy.";
+            p = `Act as an expert Talent Acquisition Specialist and Executive Recruiter.\n\nPOSITION DETAILS:\n- Title: ${getV('taJobTitle') || "[Title]"}\n- Seniority: ${getV('taSeniority')}\n- Industry: ${getV('taIndustry')}\n\nCONTEXT & DNA:\n- Qualifications: ${getV('taQuals')}\n- Culture: ${gS('taCulture', 'taCultureOther')}`;
+            if (isC('checkComp')) p += `\n- Compensation: ${getV('inputComp')}`;
+            if (isC('checkLoc')) p += `\n- Location: ${getV('inputLoc')}`;
+            if (isC('checkExtra')) p += `\n- Additional Info: ${getV('inputExtra')}`;
+            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nSTYLE SPECIFICATIONS:\n- Tone: ${gS('taTone', 'taToneOther')}\n- Standard: Top 1% Executive Recruitment standards.`;
         }
         document.getElementById('output').innerText = p;
     }
@@ -303,7 +347,8 @@
         textArea.select();
         document.execCommand('copy');
         btn.innerText = "COPIED!";
-        setTimeout(() => { btn.innerText = "COPY TO CLIPBOARD"; }, 2000);
+        btn.style.backgroundColor = "#FFFFFF";
+        setTimeout(() => { btn.innerText = "COPY TO CLIPBOARD"; btn.style.backgroundColor = "var(--accent)"; }, 2000);
     }
     window.onload = renderRoleUI;
 </script>
