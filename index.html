@@ -117,7 +117,6 @@
         generatePrompt();
     }
 
-    // Dynamic Framework Logic for Consultant
     function updateConsultantFrameworks() {
         const objective = document.getElementById('mcObjective').value;
         const frameworkSel = document.getElementById('mcFramework');
@@ -129,24 +128,24 @@
         if (objective === "Market Analysis") {
             options = ["Porter's Five Forces", "PESTEL Analysis", "SWOT Analysis", "Consumer Persona Profile"];
             condHTML = `
-                <div class="field-group"><label id="labelCond1">Competitive Landscape</label><textarea id="mcCond1" rows="2" placeholder="e.g. List top 3 competitors and their estimated market share..." oninput="generatePrompt()"></textarea></div>
-                <div class="field-group"><label id="labelCond2">Target Demographics</label><textarea id="mcCond2" rows="2" placeholder="e.g. High-net-worth individuals, Gen Z tech-adopters in urban areas..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label id="labelCond1">Competitive Landscape</label><textarea id="mcCond1" rows="2" placeholder="e.g. Identify primary competitors and their estimated market positioning..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label id="labelCond2">Target Demographics</label><textarea id="mcCond2" rows="2" placeholder="e.g. Detail the age, income, and psychographic profiles of the core user..." oninput="generatePrompt()"></textarea></div>
             `;
         } else if (objective === "Profitability") {
             options = ["Profit Tree (Revenue/Cost)", "Value Chain Analysis", "EBITDA Lever Map"];
             condHTML = `
-                <div class="field-group"><label id="labelCond1">Revenue Streams</label><input type="text" id="mcCond1" placeholder="e.g. Recurring subscriptions, professional services, hardware sales..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label id="labelCond2">Cost Structure</label><input type="text" id="mcCond2" placeholder="e.g. High variable shipping costs, fixed R&D overhead..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label id="labelCond1">Revenue Streams</label><input type="text" id="mcCond1" placeholder="e.g. SaaS recurring revenue, ad-spend, hardware sales..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label id="labelCond2">Cost Structure</label><input type="text" id="mcCond2" placeholder="e.g. Variable production costs, fixed executive overhead..." oninput="generatePrompt()"></div>
             `;
         } else if (objective === "Market Entry") {
             options = ["3C’s Model (Company, Customer, Competitor)", "Ansoff Matrix", "Blue Ocean Strategy"];
             condHTML = `
-                <div class="field-group"><label id="labelCond1">Barriers to Entry</label><input type="text" id="mcCond1" placeholder="e.g. Capital intensity, high regulatory hurdles, IP protection..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label id="labelCond1">Barriers to Entry</label><input type="text" id="mcCond1" placeholder="e.g. Regulatory compliance, high initial capital, brand loyalty of incumbents..." oninput="generatePrompt()"></div>
             `;
         } else if (objective === "Operational Excellence") {
             options = ["McKinsey 7-S Framework", "Lean Six Sigma Map", "Process Bottleneck Analysis"];
             condHTML = `
-                <div class="field-group"><label id="labelCond1">Known Bottlenecks</label><textarea id="mcCond1" rows="2" placeholder="e.g. Legacy IT systems causing data silos, multi-layer approval cycles..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label id="labelCond1">Known Bottlenecks</label><textarea id="mcCond1" rows="2" placeholder="e.g. Fragmented IT infrastructure, slow cross-departmental approvals..." oninput="generatePrompt()"></textarea></div>
             `;
         }
 
@@ -178,20 +177,29 @@
                 </div>
 
                 <h3>Context & Expert Data</h3>
-                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="e.g. Stagnant revenue growth in our primary APAC markets despite a significant increase in local marketing spend..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="e.g. Stagnant growth in the APAC region despite a 20% increase in marketing spend..." oninput="generatePrompt()"></textarea></div>
                 <div id="mcConditionalFields"></div>
 
-                <h3>Output Settings</h3>
+                <h3>Task & Output</h3>
+                <div class="row-group">
+                    <input type="checkbox" id="checkCustomTask" onchange="toggleField('checkCustomTask', 'inputCustomTask')">
+                    <label>Override Standard Task?</label>
+                </div>
+                <div id="inputCustomTask" class="hidden-field">
+                    <textarea id="mcCustomTaskText" rows="3" placeholder="Enter your specific instructions for the consultant..." oninput="generatePrompt()"></textarea>
+                </div>
+
                 <div class="field-group">
                     <label>Target Deliverable</label>
                     <select id="mcDeliverable" onchange="toggleSelectOther('mcDeliverable', 'mcDeliverableOther')">
                         <option value="Executive Memo (1-page)">Executive Memo (1-page)</option>
                         <option value="Board Presentation Outline">Board Presentation Outline</option>
+                        <option value="1-year and 5-year plan">1-year and 5-year plan</option>
                         <option value="30-60-90 Day Roadmap">30-60-90 Day Roadmap</option>
                         <option value="Risk Assessment Matrix">Risk Assessment Matrix</option>
                         <option value="Other">Other</option>
                     </select>
-                    <input type="text" id="mcDeliverableOther" class="hidden-field" placeholder="e.g. Investor Pitch Deck, Technical Audit..." oninput="generatePrompt()">
+                    <input type="text" id="mcDeliverableOther" class="hidden-field" placeholder="Specify custom deliverable..." oninput="generatePrompt()">
                 </div>
             `;
             updateConsultantFrameworks();
@@ -238,7 +246,7 @@
                     <input type="text" id="shotTypeOther" class="hidden-field" placeholder="Specify custom angle..." oninput="generatePrompt()">
                 </div>
                 <div class="row-group"><input type="checkbox" id="camMoveCheck" onchange="toggleField('camMoveCheck', 'camMoveInput')"><label>Include Camera Movement?</label></div>
-                <div id="camMoveInput" class="hidden-field"><input type="text" id="camMoveText" placeholder="e.g. Slow Dolly Zoom, 360-degree rotation..." oninput="generatePrompt()"></div>
+                <div id="camMoveInput" class="hidden-field"><input type="text" id="camMoveText" placeholder="e.g. Slow Dolly Zoom, 360-degree rotation, Handheld shake..." oninput="generatePrompt()"></div>
                 <h3>Subject & Action</h3>
                 <div class="field-group"><label>Subject Description</label><span class="hint">[Who/What] - [Specific action] - [Expressions/gestures]</span><textarea id="subjectAction" rows="3" placeholder="e.g. CEO - Standing at window - Looking determined..." oninput="generatePrompt()"></textarea></div>
                 <h3>Environment</h3>
@@ -340,7 +348,6 @@
             const label1 = document.getElementById('labelCond1') ? document.getElementById('labelCond1').innerText : "";
             const label2 = document.getElementById('labelCond2') ? document.getElementById('labelCond2').innerText : "";
 
-            // Mapping Objectives to specific "Task" verbs
             const taskMap = {
                 "Market Analysis": "Analyze the current market landscape to identify growth opportunities and competitive threats.",
                 "Profitability": "Perform a deep-dive profitability analysis to identify margin expansion levers and cost-saving opportunities.",
@@ -348,11 +355,13 @@
                 "Operational Excellence": "Review current operations to optimize processes, remove bottlenecks, and improve organizational efficiency."
             };
 
+            const taskInstruction = isC('checkCustomTask') ? getV('mcCustomTaskText') : (taskMap[obj] || "Analyze the situation and provide strategic recommendations.");
+
             p = `Act as a Managing Partner at a top-tier global strategy consultancy.\n\nBUSINESS PROBLEM:\n${getV('mcContext') || "[Context missing]"}\n\nSTRATEGIC FOCUS:\n- Objective: ${obj}\n- Framework: ${frm}`;
             if (cond1) p += `\n- ${label1}: ${cond1}`;
             if (cond2) p += `\n- ${label2}: ${cond2}`;
             
-            p += `\n\nYOUR TASK:\n${taskMap[obj] || "Analyze the situation and provide strategic recommendations."}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant (Mutually Exclusive, Collectively Exhaustive).`;
+            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant (Mutually Exclusive, Collectively Exhaustive).`;
 
         } else if (role === "Translator") {
             p = `Act as a master Localization Expert and Translator. Translate from ${getV('sourceLang') || "[Source]"} to ${getV('targetLang') || "[Target]"}.\n\nSPECIFICATIONS:\n- Tone: ${gS('transTone', 'transToneOther')}\n- Material: ${gS('transMaterial', 'transMaterialOther')}\n- Context: ${getV('transContext')}\n`;
