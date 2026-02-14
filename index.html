@@ -100,7 +100,6 @@
 <textarea id="tempCopyArea" style="position:absolute; left:-9999px;"></textarea>
 
 <script>
-    // Safety utilities
     function getV(id) { const el = document.getElementById(id); return el ? el.value : ""; }
     function isC(id) { const el = document.getElementById(id); return el ? el.checked : false; }
 
@@ -130,24 +129,24 @@
         if (objective === "Market Analysis") {
             options = ["Porter's Five Forces", "PESTEL Analysis", "SWOT Analysis", "Consumer Persona Profile"];
             condHTML = `
-                <div class="field-group"><label>Competitive Landscape</label><textarea id="mcCond1" rows="2" placeholder="e.g. List top 3 competitors and their market share..." oninput="generatePrompt()"></textarea></div>
-                <div class="field-group"><label>Target Demographics</label><textarea id="mcCond2" rows="2" placeholder="e.g. High-income professionals, Gen Z tech-adopters..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label id="labelCond1">Competitive Landscape</label><textarea id="mcCond1" rows="2" placeholder="e.g. List top 3 competitors and their estimated market share..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label id="labelCond2">Target Demographics</label><textarea id="mcCond2" rows="2" placeholder="e.g. High-net-worth individuals, Gen Z tech-adopters in urban areas..." oninput="generatePrompt()"></textarea></div>
             `;
         } else if (objective === "Profitability") {
             options = ["Profit Tree (Revenue/Cost)", "Value Chain Analysis", "EBITDA Lever Map"];
             condHTML = `
-                <div class="field-group"><label>Revenue Streams</label><input type="text" id="mcCond1" placeholder="e.g. Subscription fees, hardware sales..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label>Cost Structure</label><input type="text" id="mcCond2" placeholder="e.g. High R&D overhead, Variable shipping costs..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label id="labelCond1">Revenue Streams</label><input type="text" id="mcCond1" placeholder="e.g. Recurring subscriptions, professional services, hardware sales..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label id="labelCond2">Cost Structure</label><input type="text" id="mcCond2" placeholder="e.g. High variable shipping costs, fixed R&D overhead..." oninput="generatePrompt()"></div>
             `;
         } else if (objective === "Market Entry") {
             options = ["3C’s Model (Company, Customer, Competitor)", "Ansoff Matrix", "Blue Ocean Strategy"];
             condHTML = `
-                <div class="field-group"><label>Barriers to Entry</label><input type="text" id="mcCond1" placeholder="e.g. High regulatory hurdles, Patent protection..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label id="labelCond1">Barriers to Entry</label><input type="text" id="mcCond1" placeholder="e.g. Capital intensity, high regulatory hurdles, IP protection..." oninput="generatePrompt()"></div>
             `;
         } else if (objective === "Operational Excellence") {
             options = ["McKinsey 7-S Framework", "Lean Six Sigma Map", "Process Bottleneck Analysis"];
             condHTML = `
-                <div class="field-group"><label>Known Bottlenecks</label><textarea id="mcCond1" rows="2" placeholder="e.g. Legacy IT systems, Slow approval cycles..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label id="labelCond1">Known Bottlenecks</label><textarea id="mcCond1" rows="2" placeholder="e.g. Legacy IT systems causing data silos, multi-layer approval cycles..." oninput="generatePrompt()"></textarea></div>
             `;
         }
 
@@ -179,7 +178,7 @@
                 </div>
 
                 <h3>Context & Expert Data</h3>
-                <div class="field-group"><label>The Business Friction</label><textarea id="mcContext" rows="4" placeholder="e.g. Stagnant growth in the APAC region despite a 20% increase in marketing spend..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="e.g. Stagnant revenue growth in our primary APAC markets despite a significant increase in local marketing spend..." oninput="generatePrompt()"></textarea></div>
                 <div id="mcConditionalFields"></div>
 
                 <h3>Output Settings</h3>
@@ -338,11 +337,22 @@
             const deliver = gS('mcDeliverable', 'mcDeliverableOther');
             const cond1 = getV('mcCond1');
             const cond2 = getV('mcCond2');
+            const label1 = document.getElementById('labelCond1') ? document.getElementById('labelCond1').innerText : "";
+            const label2 = document.getElementById('labelCond2') ? document.getElementById('labelCond2').innerText : "";
+
+            // Mapping Objectives to specific "Task" verbs
+            const taskMap = {
+                "Market Analysis": "Analyze the current market landscape to identify growth opportunities and competitive threats.",
+                "Profitability": "Perform a deep-dive profitability analysis to identify margin expansion levers and cost-saving opportunities.",
+                "Market Entry": "Develop a comprehensive market entry strategy to ensure a successful and scalable launch.",
+                "Operational Excellence": "Review current operations to optimize processes, remove bottlenecks, and improve organizational efficiency."
+            };
+
+            p = `Act as a Managing Partner at a top-tier global strategy consultancy.\n\nBUSINESS PROBLEM:\n${getV('mcContext') || "[Context missing]"}\n\nSTRATEGIC FOCUS:\n- Objective: ${obj}\n- Framework: ${frm}`;
+            if (cond1) p += `\n- ${label1}: ${cond1}`;
+            if (cond2) p += `\n- ${label2}: ${cond2}`;
             
-            p = `Act as a Managing Partner at a top-tier global strategy consultancy.\n\nOBJECTIVE: ${obj}\nFRAMEWORK: ${frm}\n\nBUSINESS CONTEXT:\n${getV('mcContext') || "[No Context provided]"}`;
-            if (cond1) p += `\n\nKEY DATA POINT 1: ${cond1}`;
-            if (cond2) p += `\n\nKEY DATA POINT 2: ${cond2}`;
-            p += `\n\nTASK: Generate a ${deliver} that follows a high-impact, executive tone. Focus on MECE-compliant logic and clear, actionable strategic levers.`;
+            p += `\n\nYOUR TASK:\n${taskMap[obj] || "Analyze the situation and provide strategic recommendations."}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant (Mutually Exclusive, Collectively Exhaustive).`;
 
         } else if (role === "Translator") {
             p = `Act as a master Localization Expert and Translator. Translate from ${getV('sourceLang') || "[Source]"} to ${getV('targetLang') || "[Target]"}.\n\nSPECIFICATIONS:\n- Tone: ${gS('transTone', 'transToneOther')}\n- Material: ${gS('transMaterial', 'transMaterialOther')}\n- Context: ${getV('transContext')}\n`;
