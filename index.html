@@ -22,18 +22,25 @@
 
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: var(--white); display: flex; justify-content: center; }
         
+        /* DESKTOP STABILITY FIX */
         .app-wrapper {
             display: flex; flex-direction: row; gap: 30px; width: 100%; max-width: 1100px;
             padding: 20px; box-sizing: border-box; min-height: 100vh;
+            align-items: flex-start;
         }
 
-        .input-section { flex: 1.2; display: flex; flex-direction: column; gap: 10px; }
+        .input-section { 
+            flex: 1.1; 
+            display: flex; flex-direction: column; gap: 10px; 
+            min-width: 450px; /* Prevents columns from squishing too much */
+        }
 
         .preview-section {
-            flex: 0.8; background: rgba(255, 255, 255, 0.08); padding: 25px;
+            flex: 0.9; background: rgba(255, 255, 255, 0.08); padding: 25px;
             border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex; flex-direction: column; height: fit-content; 
             position: sticky; top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            min-width: 350px;
         }
 
         h3 { font-size: 0.85rem; margin: 20px 0 8px 0; color: var(--accent); border-bottom: 1px solid rgba(244, 199, 68, 0.2); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
@@ -54,7 +61,7 @@
             border-radius: 6px; font-size: 0.95rem; background: var(--white); color: var(--navy); font-family: inherit;
         }
 
-        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
+        input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; flex-shrink: 0; }
         .hidden-field { display: none; margin-top: 8px; width: 100%; }
 
         .prompt-header { font-size: 0.75rem; font-weight: bold; color: var(--accent); margin-bottom: 12px; border-bottom: 1px solid rgba(244, 199, 68, 0.3); padding-bottom: 8px; text-transform: uppercase; }
@@ -62,14 +69,16 @@
 
         .copy-btn { 
             background-color: var(--accent); color: var(--navy); border: none; padding: 16px; 
-            font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; 
+            font-weight: 800; border-radius: 8px; cursor: pointer; transition: 0.3s; 
             font-size: 0.9rem; text-transform: uppercase; width: 100%;
         }
-        .copy-btn:hover { background-color: #FFFFFF; }
+        .copy-btn:hover { background-color: #FFFFFF; transform: translateY(-2px); }
 
-        @media (max-width: 850px) {
+        /* ONLY STACK ON MOBILE DEVICES (700px or less) */
+        @media (max-width: 700px) {
             .app-wrapper { flex-direction: column; height: auto; padding: 15px; }
-            .preview-section { position: relative; top: 0; width: 100%; height: auto; margin-top: 20px; }
+            .input-section { min-width: 100%; }
+            .preview-section { position: relative; top: 0; width: 100%; min-width: 100%; height: auto; margin-top: 20px; }
             .flex-row { flex-direction: column; }
         }
     </style>
@@ -128,24 +137,24 @@
         if (objective === "Market Analysis") {
             options = ["Porter's Five Forces", "PESTEL Analysis", "SWOT Analysis", "Consumer Persona Profile"];
             condHTML = `
-                <div class="field-group"><label id="labelCond1">Competitive Landscape</label><textarea id="mcCond1" rows="2" placeholder="e.g. Identify primary competitors and their estimated market positioning..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label id="labelCond1">Competitive Landscape</label><textarea id="mcCond1" rows="2" placeholder="e.g. Identify primary competitors and their market positioning..." oninput="generatePrompt()"></textarea></div>
                 <div class="field-group"><label id="labelCond2">Target Demographics</label><textarea id="mcCond2" rows="2" placeholder="e.g. Detail the age, income, and psychographic profiles of the core user..." oninput="generatePrompt()"></textarea></div>
             `;
         } else if (objective === "Profitability") {
             options = ["Profit Tree (Revenue/Cost)", "Value Chain Analysis", "EBITDA Lever Map"];
             condHTML = `
-                <div class="field-group"><label id="labelCond1">Revenue Streams</label><input type="text" id="mcCond1" placeholder="e.g. SaaS recurring revenue, ad-spend, hardware sales..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label id="labelCond2">Cost Structure</label><input type="text" id="mcCond2" placeholder="e.g. Variable production costs, fixed executive overhead..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label id="labelCond1">Revenue Streams</label><input type="text" id="mcCond1" placeholder="e.g. SaaS recurring revenue, hardware sales..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label id="labelCond2">Cost Structure</label><input type="text" id="mcCond2" placeholder="e.g. High production costs, fixed overhead..." oninput="generatePrompt()"></div>
             `;
         } else if (objective === "Market Entry") {
             options = ["3C’s Model (Company, Customer, Competitor)", "Ansoff Matrix", "Blue Ocean Strategy"];
             condHTML = `
-                <div class="field-group"><label id="labelCond1">Barriers to Entry</label><input type="text" id="mcCond1" placeholder="e.g. Regulatory compliance, high initial capital, brand loyalty of incumbents..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label id="labelCond1">Barriers to Entry</label><input type="text" id="mcCond1" placeholder="e.g. Regulatory compliance, high initial capital..." oninput="generatePrompt()"></div>
             `;
         } else if (objective === "Operational Excellence") {
             options = ["McKinsey 7-S Framework", "Lean Six Sigma Map", "Process Bottleneck Analysis"];
             condHTML = `
-                <div class="field-group"><label id="labelCond1">Known Bottlenecks</label><textarea id="mcCond1" rows="2" placeholder="e.g. Fragmented IT infrastructure, slow cross-departmental approvals..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label id="labelCond1">Known Bottlenecks</label><textarea id="mcCond1" rows="2" placeholder="e.g. Legacy IT systems, slow approval cycles..." oninput="generatePrompt()"></textarea></div>
             `;
         }
 
@@ -173,22 +182,14 @@
                 <div class="field-group">
                     <label>Consulting Framework</label>
                     <select id="mcFramework" onchange="toggleSelectOther('mcFramework', 'mcFrameworkOther')"></select>
-                    <input type="text" id="mcFrameworkOther" class="hidden-field" placeholder="e.g. Custom Issue Tree, Balanced Scorecard..." oninput="generatePrompt()">
+                    <input type="text" id="mcFrameworkOther" class="hidden-field" placeholder="e.g. Custom Issue Tree..." oninput="generatePrompt()">
                 </div>
-
                 <h3>Context & Expert Data</h3>
-                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="e.g. Stagnant growth in the APAC region despite a 20% increase in marketing spend..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="e.g. Stagnant growth in APAC..." oninput="generatePrompt()"></textarea></div>
                 <div id="mcConditionalFields"></div>
-
                 <h3>Task & Output</h3>
-                <div class="row-group">
-                    <input type="checkbox" id="checkCustomTask" onchange="toggleField('checkCustomTask', 'inputCustomTask')">
-                    <label>Override Standard Task?</label>
-                </div>
-                <div id="inputCustomTask" class="hidden-field">
-                    <textarea id="mcCustomTaskText" rows="3" placeholder="Enter your specific instructions for the consultant..." oninput="generatePrompt()"></textarea>
-                </div>
-
+                <div class="row-group"><input type="checkbox" id="checkCustomTask" onchange="toggleField('checkCustomTask', 'inputCustomTask')"><label>Override Standard Task?</label></div>
+                <div id="inputCustomTask" class="hidden-field"><textarea id="mcCustomTaskText" rows="3" placeholder="Enter your specific instructions..." oninput="generatePrompt()"></textarea></div>
                 <div class="field-group">
                     <label>Target Deliverable</label>
                     <select id="mcDeliverable" onchange="toggleSelectOther('mcDeliverable', 'mcDeliverableOther')">
@@ -199,7 +200,7 @@
                         <option value="Risk Assessment Matrix">Risk Assessment Matrix</option>
                         <option value="Other">Other</option>
                     </select>
-                    <input type="text" id="mcDeliverableOther" class="hidden-field" placeholder="Specify custom deliverable..." oninput="generatePrompt()">
+                    <input type="text" id="mcDeliverableOther" class="hidden-field" placeholder="Specify deliverable..." oninput="generatePrompt()">
                 </div>
             `;
             updateConsultantFrameworks();
@@ -207,8 +208,8 @@
             container.innerHTML = `
                 <h3>Languages</h3>
                 <div class="flex-row">
-                    <div class="field-group flex-item"><label>Source Language</label><input type="text" id="sourceLang" placeholder="e.g. French, Mandarin, German..." oninput="generatePrompt()"></div>
-                    <div class="field-group flex-item"><label>Target Language</label><input type="text" id="targetLang" placeholder="e.g. UK English, Spanish, Brazilian Portuguese..." oninput="generatePrompt()"></div>
+                    <div class="field-group flex-item"><label>Source Language</label><input type="text" id="sourceLang" placeholder="e.g. French, Mandarin..." oninput="generatePrompt()"></div>
+                    <div class="field-group flex-item"><label>Target Language</label><input type="text" id="targetLang" placeholder="e.g. UK English, Spanish..." oninput="generatePrompt()"></div>
                 </div>
                 <h3>Specifications</h3>
                 <div class="field-group">
@@ -223,17 +224,17 @@
                     <select id="transMaterial" onchange="toggleSelectOther('transMaterial', 'transMaterialOther')">
                         <option value="Legal Contract">Legal Contract</option><option value="Marketing Copy">Marketing Copy</option><option value="Technical Manual">Technical Manual</option><option value="Internal Email">Internal Email</option><option value="Other">Other</option>
                     </select>
-                    <input type="text" id="transMaterialOther" class="hidden-field" placeholder="Specify material type..." oninput="generatePrompt()">
+                    <input type="text" id="transMaterialOther" class="hidden-field" placeholder="Specify material..." oninput="generatePrompt()">
                 </div>
                 <h3>Context & Nuance</h3>
-                <div class="field-group"><label>Usage Context</label><textarea id="transContext" rows="3" placeholder="e.g. Keynote speech in Tokyo, sensitive negotiation in Dubai..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Usage Context</label><textarea id="transContext" rows="3" placeholder="e.g. Keynote speech in Tokyo..." oninput="generatePrompt()"></textarea></div>
                 <div class="checkbox-grid">
                     <div class="checkbox-item"><input type="checkbox" id="checkNuance" onchange="generatePrompt()"><label>Include Nuance Report</label></div>
                     <div class="checkbox-item"><input type="checkbox" id="checkProtect" onchange="toggleField('checkProtect', 'inputProtect')"><label>Terminology Protection</label></div>
                 </div>
-                <input type="text" id="inputProtect" class="hidden-field" placeholder="Terms to NEVER translate (e.g. Brand names)..." oninput="generatePrompt()">
+                <input type="text" id="inputProtect" class="hidden-field" placeholder="Terms to NEVER translate..." oninput="generatePrompt()">
                 <h3>Content to Translate</h3>
-                <div class="field-group"><label>Source Text</label><textarea id="transSource" rows="6" placeholder="Paste your text here..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><textarea id="transSource" rows="6" placeholder="Paste your text here..." oninput="generatePrompt()"></textarea></div>
             `;
         } else if (role === "Film Director") {
             container.innerHTML = `
@@ -246,46 +247,46 @@
                     <input type="text" id="shotTypeOther" class="hidden-field" placeholder="Specify custom angle..." oninput="generatePrompt()">
                 </div>
                 <div class="row-group"><input type="checkbox" id="camMoveCheck" onchange="toggleField('camMoveCheck', 'camMoveInput')"><label>Include Camera Movement?</label></div>
-                <div id="camMoveInput" class="hidden-field"><input type="text" id="camMoveText" placeholder="e.g. Slow Dolly Zoom, 360-degree rotation, Handheld shake..." oninput="generatePrompt()"></div>
+                <div id="camMoveInput" class="hidden-field"><input type="text" id="camMoveText" placeholder="e.g. Slow Dolly Zoom..." oninput="generatePrompt()"></div>
                 <h3>Subject & Action</h3>
-                <div class="field-group"><label>Subject Description</label><span class="hint">[Who/What] - [Specific action] - [Expressions/gestures]</span><textarea id="subjectAction" rows="3" placeholder="e.g. CEO - Standing at window - Looking determined..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Subject Description</label><span class="hint">[Who/What] - [Specific action] - [Expressions/gestures]</span><textarea id="subjectAction" rows="3" placeholder="e.g. CEO pacing board room..." oninput="generatePrompt()"></textarea></div>
                 <h3>Environment</h3>
                 <div class="field-group">
                     <label>Setting</label>
                     <select id="setting" onchange="toggleSelectOther('setting', 'settingOther')">
                         <option value="Minimalist Executive Suite">Minimalist Executive Suite</option><option value="High-tech Innovation Lab">High-tech Innovation Lab</option><option value="Futuristic Urban Skyline">Futuristic Urban Skyline</option><option value="Sustainable Green Campus">Sustainable Green Campus</option><option value="Industrial Factory Floor">Industrial Factory Floor</option><option value="Other">Other</option>
                     </select>
-                    <input type="text" id="settingOther" class="hidden-field" placeholder="Specify custom setting..." oninput="generatePrompt()">
+                    <input type="text" id="settingOther" class="hidden-field" placeholder="Specify setting..." oninput="generatePrompt()">
                 </div>
                 <div class="field-group">
                     <label>Time of Day</label>
                     <select id="timeOfDay" onchange="toggleSelectOther('timeOfDay', 'timeOther')">
-                        <option value="Golden Hour (Warm/Aspirational)">Golden Hour</option><option value="Blue Hour (Cool/Sleek)">Blue Hour</option><option value="High Noon (Clear/Direct)">High Noon</option><option value="Night/Neon (Modern/Tech-focused)">Night/Neon</option><option value="Other">Other</option>
+                        <option value="Golden Hour">Golden Hour</option><option value="Blue Hour">Blue Hour</option><option value="High Noon">High Noon</option><option value="Night/Neon">Night/Neon</option><option value="Other">Other</option>
                     </select>
-                    <input type="text" id="timeOther" class="hidden-field" placeholder="Specify custom time..." oninput="generatePrompt()">
+                    <input type="text" id="timeOther" class="hidden-field" placeholder="Specify time..." oninput="generatePrompt()">
                 </div>
-                <div class="field-group"><label>Background Details</label><input type="text" id="bgDetails" placeholder="e.g. Floating data holograms..." oninput="generatePrompt()"></div>
+                <div class="field-group"><label>Background Details</label><input type="text" id="bgDetails" placeholder="e.g. Rainfall, floating UI..." oninput="generatePrompt()"></div>
                 <h3>Style & Ambiance</h3>
                 <div class="field-group">
                     <label>Aesthetic / Film Genre</label>
                     <select id="aesthetic" onchange="toggleSelectOther('aesthetic', 'aestheticOther')">
                         <option value="Cinematic Blockbuster">Cinematic Blockbuster</option><option value="Minimalist Tech">Minimalist Tech</option><option value="Corporate Noir">Corporate Noir</option><option value="National Geographic Documentary">National Geographic Documentary</option><option value="Retro-Futurism">Retro-Futurism</option><option value="Other">Other</option>
                     </select>
-                    <input type="text" id="aestheticOther" class="hidden-field" placeholder="Specify custom genre..." oninput="generatePrompt()">
+                    <input type="text" id="aestheticOther" class="hidden-field" placeholder="Specify genre..." oninput="generatePrompt()">
                 </div>
                 <div class="field-group">
                     <label>Lighting Style</label>
                     <select id="lighting" onchange="toggleSelectOther('lighting', 'lightingOther')">
-                        <option value="Rembrandt Lighting (Classic/Moody)">Rembrandt</option><option value="Softbox (Clean/Professional)">Softbox</option><option value="High-Key (Bright/Optimistic)">High-Key</option><option value="Volumetric Lighting (Dramatic light beams)">Volumetric</option><option value="Other">Other</option>
+                        <option value="Rembrandt Lighting">Rembrandt</option><option value="Softbox">Softbox</option><option value="High-Key">High-Key</option><option value="Volumetric Lighting">Volumetric</option><option value="Other">Other</option>
                     </select>
-                    <input type="text" id="lightingOther" class="hidden-field" placeholder="Specify custom lighting..." oninput="generatePrompt()">
+                    <input type="text" id="lightingOther" class="hidden-field" placeholder="Specify lighting..." oninput="generatePrompt()">
                 </div>
                 <div class="field-group">
                     <label>Color Palette</label>
                     <select id="color" onchange="toggleSelectOther('color', 'colorOther')">
-                        <option value="Teal and Orange (Modern Cinema)">Teal and Orange</option><option value="Monochrome/Grayscale (Sophisticated)">Monochrome/Grayscale</option><option value="Deep Blues & Silvers (Trust/Tech)">Deep Blues & Silvers</option><option value="Earth Tones (Sustainability/Human)">Earth Tones</option><option value="Other">Other</option>
+                        <option value="Teal and Orange">Teal and Orange</option><option value="Monochrome/Grayscale">Monochrome</option><option value="Deep Blues & Silvers">Deep Blues & Silvers</option><option value="Earth Tones">Earth Tones</option><option value="Other">Other</option>
                     </select>
-                    <input type="text" id="colorOther" class="hidden-field" placeholder="Specify custom colors..." oninput="generatePrompt()">
+                    <input type="text" id="colorOther" class="hidden-field" placeholder="Specify colors..." oninput="generatePrompt()">
                 </div>
                 <h3>Audio (Optional)</h3>
                 <div class="row-group"><input type="checkbox" id="audioCheck" onchange="toggleField('audioCheck', 'audioFields')"><label>Include Audio?</label></div>
@@ -312,18 +313,18 @@
         } else if (role === "Other") {
             container.innerHTML = `
                 <h3>The Fundamentals</h3>
-                <div class="field-group"><label>Acting Role</label><input type="text" id="customRole" placeholder="e.g. Senior VP of Sales, Crisis Manager..." oninput="generatePrompt()"></div>
-                <div class="field-group"><label>Context</label><textarea id="customContext" rows="3" placeholder="e.g. Preparing for a board meeting / Revenue down 10%..." oninput="generatePrompt()"></textarea></div>
-                <div class="field-group"><label>Task</label><textarea id="customTask" rows="3" placeholder="e.g. Write a strategy memo / Draft a 3-month roadmap..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Role</label><input type="text" id="customRole" placeholder="e.g. Senior Product Manager" oninput="generatePrompt()"></div>
+                <div class="field-group"><label>Context</label><textarea id="customContext" rows="3" placeholder="Describe the situation..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Task</label><textarea id="customTask" rows="3" placeholder="What do you need the AI to do?" oninput="generatePrompt()"></textarea></div>
                 <h3>Strategic Levers (Optional)</h3>
                 <div class="row-group"><input type="checkbox" id="checkAudience" onchange="toggleField('checkAudience', 'inputAudience')"><label>Target Audience</label></div>
-                <input type="text" id="inputAudience" class="hidden-field" placeholder="e.g. Investor Committee, Skeptical Stakeholders..." oninput="generatePrompt()">
+                <input type="text" id="inputAudience" class="hidden-field" placeholder="Who is the end user?" oninput="generatePrompt()">
                 <div class="row-group"><input type="checkbox" id="checkConstraints" onchange="toggleField('checkConstraints', 'inputConstraints')"><label>Constraints</label></div>
-                <input type="text" id="inputConstraints" class="hidden-field" placeholder="e.g. Keep under 300 words, avoid industry jargon..." oninput="generatePrompt()">
+                <input type="text" id="inputConstraints" class="hidden-field" placeholder="What are the 'No-Go' zones?" oninput="generatePrompt()">
                 <div class="row-group"><input type="checkbox" id="checkFormat" onchange="toggleField('checkFormat', 'inputFormat')"><label>Format</label></div>
-                <input type="text" id="inputFormat" class="hidden-field" placeholder="e.g. 5-Slide Outline, Comparative Table..." oninput="generatePrompt()">
+                <input type="text" id="inputFormat" class="hidden-field" placeholder="e.g. Table, Bulleted List..." oninput="generatePrompt()">
                 <div class="row-group"><input type="checkbox" id="checkTone" onchange="toggleField('checkTone', 'inputTone')"><label>Tone</label></div>
-                <input type="text" id="inputTone" class="hidden-field" placeholder="e.g. Visionary, Direct & Analytical..." oninput="generatePrompt()">
+                <input type="text" id="inputTone" class="hidden-field" placeholder="e.g. Visionary..." oninput="generatePrompt()">
             `;
         }
         generatePrompt();
