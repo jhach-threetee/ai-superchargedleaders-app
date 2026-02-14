@@ -69,7 +69,6 @@
         .copy-btn { background-color: var(--accent); color: var(--navy); border: none; padding: 14px; font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; font-size: 0.85rem; text-transform: uppercase; flex-shrink: 0; }
         .copy-btn:hover { background-color: #FFFFFF; }
 
-        /* Custom Scrollbars */
         .input-section::-webkit-scrollbar, #output::-webkit-scrollbar { width: 6px; }
         .input-section::-webkit-scrollbar-thumb, #output::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
@@ -164,19 +163,7 @@
         if (role === "Film Director") {
             container.innerHTML = `
                 <h3>Cinematography</h3>
-                <div class="field-group">
-                    <label>Shot Type / Angle</label>
-                    <select id="shotType" onchange="toggleSelectOther('shotType', 'shotTypeOther')">
-                        <option value="Wide Shot (Establishing context)">Wide Shot</option>
-                        <option value="Medium Shot (Standard interaction)">Medium Shot</option>
-                        <option value="Close-up (Emotional impact)">Close-up</option>
-                        <option value="Low Angle (Power/Authority)">Low Angle</option>
-                        <option value="High Angle (Overview/Vulnerability)">High Angle</option>
-                        <option value="Bird’s Eye View (Strategy/Scale)">Bird’s Eye View</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <input type="text" id="shotTypeOther" class="hidden-field" placeholder="Specify custom angle..." oninput="generatePrompt()">
-                </div>
+                <div class="field-group"><label>Shot Type / Angle</label><select id="shotType" onchange="toggleSelectOther('shotType', 'shotTypeOther')"><option value="Wide Shot (Establishing context)">Wide Shot</option><option value="Medium Shot (Standard interaction)">Medium Shot</option><option value="Close-up (Emotional impact)">Close-up</option><option value="Low Angle (Power/Authority)">Low Angle</option><option value="High Angle (Overview/Vulnerability)">High Angle</option><option value="Bird’s Eye View (Strategy/Scale)">Bird’s Eye View</option><option value="Other">Other</option></select><input type="text" id="shotTypeOther" class="hidden-field" placeholder="Specify custom angle..." oninput="generatePrompt()"></div>
                 <div class="row-group"><input type="checkbox" id="camMoveCheck" onchange="toggleField('camMoveCheck', 'camMoveInput')"><label>Include Camera Movement?</label></div>
                 <div id="camMoveInput" class="hidden-field"><input type="text" id="camMoveText" placeholder="e.g. Slow Dolly Zoom..." oninput="generatePrompt()"></div>
                 <h3>Subject & Action</h3>
@@ -232,6 +219,9 @@
                 <h3>Context & Expert Data</h3>
                 <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="Describe the core business problem..." oninput="generatePrompt()"></textarea></div>
                 <div id="mcConditionalFields"></div>
+                <h3>Task Customization</h3>
+                <div class="row-group"><input type="checkbox" id="checkCustomTask" onchange="toggleField('checkCustomTask', 'inputCustomTask')"><label>Override Standard Task?</label></div>
+                <div id="inputCustomTask" class="hidden-field"><textarea id="mcCustomTaskText" rows="3" placeholder="Enter specific instructions..." oninput="generatePrompt()"></textarea></div>
                 <h3>Output Settings</h3>
                 <div class="field-group"><label>Target Deliverable</label><select id="mcDeliverable" onchange="toggleSelectOther('mcDeliverable', 'mcDeliverableOther')"><option value="Executive Memo (1-page)">Executive Memo (1-page)</option><option value="Board Presentation Outline">Board Presentation Outline</option><option value="1-year and 5-year plan">1-year and 5-year plan</option><option value="30-60-90 Day Roadmap">30-60-90 Day Roadmap</option><option value="Risk Assessment Matrix">Risk Assessment Matrix</option><option value="Other">Other</option></select><input type="text" id="mcDeliverableOther" class="hidden-field" placeholder="Custom deliverable..." oninput="generatePrompt()"></div>`;
             updateConsultantFrameworks();
@@ -286,11 +276,21 @@
             const cond2 = getV('mcCond2');
             const label1 = document.getElementById('labelCond1') ? document.getElementById('labelCond1').innerText : "";
             const label2 = document.getElementById('labelCond2') ? document.getElementById('labelCond2').innerText : "";
-            const taskMap = { "Market Analysis": "Analyze the current market landscape.", "Profitability": "Identify margin expansion levers.", "Market Entry": "Develop market entry strategy.", "Operational Excellence": "Optimize operational processes." };
-            p = `Act as a Managing Partner.\n\nBUSINESS PROBLEM: ${getV('mcContext')}\n\nSTRATEGIC FOCUS:\n- Objective: ${obj}\n- Framework: ${frm}`;
+
+            const taskMap = { 
+                "Market Analysis": "Analyze the current market landscape to identify growth opportunities and competitive threats.", 
+                "Profitability": "Perform a deep-dive profitability analysis to identify margin expansion levers and cost-saving opportunities.", 
+                "Market Entry": "Develop a comprehensive market entry strategy to ensure a successful and scalable launch.", 
+                "Operational Excellence": "Review current operations to optimize processes, remove bottlenecks, and improve organizational efficiency." 
+            };
+
+            const taskInstruction = isC('checkCustomTask') ? getV('mcCustomTaskText') : (taskMap[obj] || "Provide strategic recommendations.");
+
+            p = `Act as a Managing Partner at a top-tier global strategy consultancy.\n\nBUSINESS PROBLEM: \n${getV('mcContext') || "[No Context Provided]"}\n\nSTRATEGIC FOCUS:\n- Objective: ${obj}\n- Framework: ${frm}`;
             if (cond1) p += `\n- ${label1}: ${cond1}`;
             if (cond2) p += `\n- ${label2}: ${cond2}`;
-            p += `\n\nYOUR TASK: ${taskMap[obj] || "Analyze situation."}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: Executive tone.`;
+            
+            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant (Mutually Exclusive, Collectively Exhaustive).`;
         }
         document.getElementById('output').innerText = p;
     }
