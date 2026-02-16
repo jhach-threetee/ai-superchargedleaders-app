@@ -38,7 +38,6 @@
             display: flex; flex-direction: column; height: 100%; box-sizing: border-box;
         }
 
-        h2 { font-size: 1.4rem; margin: 0; color: var(--accent); }
         h3 { font-size: 0.85rem; margin: 15px 0 5px 0; color: var(--accent); border-bottom: 1px solid rgba(244, 199, 68, 0.2); padding-bottom: 3px; text-transform: uppercase; }
         
         .field-group { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; width: 100%; }
@@ -96,13 +95,12 @@
 
 <div class="app-wrapper">
     <div class="input-section">
-        <h2>Expert Prompt Generator</h2>
         <div class="field-group">
             <label>Expert Role</label>
             <select id="roleSelector" onchange="renderRoleUI()">
+                <option value="Management Consultant" selected>Management Consultant</option>
                 <option value="Film Director">Film Director</option>
                 <option value="Translator">Translator</option>
-                <option value="Management Consultant">Management Consultant</option>
                 <option value="Talent Acquisition Specialist">Talent Acquisition Specialist</option>
                 <option value="Communication Coach">Communication Coach</option>
                 <option value="Other">Other (General Purpose)</option>
