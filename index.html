@@ -10,6 +10,7 @@
             --navy: #0C2867;
             --accent: #F4C744;
             --white: #FFFFFF;
+            --overlay: rgba(12, 40, 103, 0.85);
         }
         
         * { box-sizing: border-box; }
@@ -90,6 +91,32 @@
         }
         .copy-btn:hover { background-color: #FFFFFF; }
 
+        /* Pop-up Modal Styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--overlay); display: none; justify-content: center;
+            align-items: center; z-index: 1000; padding: 20px;
+        }
+        .modal-box {
+            background: var(--navy); border: 2px solid var(--accent);
+            padding: 40px; border-radius: 15px; max-width: 500px; width: 100%;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .modal-box h2 { color: var(--accent); margin-top: 0; font-size: 1.5rem; }
+        .modal-box p { font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px; }
+        .modal-btn {
+            background: var(--accent); color: var(--navy); padding: 15px 30px;
+            text-decoration: none; font-weight: 800; border-radius: 6px;
+            display: inline-block; transition: 0.3s;
+        }
+        .modal-btn:hover { background: var(--white); }
+        .close-modal {
+            position: absolute; top: 15px; right: 15px; color: var(--white);
+            cursor: pointer; font-size: 1.2rem; opacity: 0.5;
+        }
+        .close-modal:hover { opacity: 1; }
+
         .input-section::-webkit-scrollbar, #output::-webkit-scrollbar { width: 6px; }
         .input-section::-webkit-scrollbar-thumb { 
             background: rgba(255,255,255,0.2); border-radius: 10px; 
@@ -132,9 +159,20 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="promoModal">
+    <div class="modal-box">
+        <span class="close-modal" onclick="closeModal()">✕</span>
+        <h2>Elevate Your Strategy</h2>
+        <p>You've got the prompt. Now get the Blueprint. Join the <strong>AI Supercharged Leaders Course</strong> for $249 and move from 'using tools' to strategically leading an AI Supercharged organization.</p>
+        <a href="https://www.aisuperchargedleaders.com/products/courses/aisuperchargedleaders" class="modal-btn">Get the Blueprint Now</a>
+    </div>
+</div>
+
 <textarea id="tempCopyArea" style="position:absolute; left:-9999px;"></textarea>
 
 <script>
+    let copyCount = 0; // Click tracker
+
     function getV(id) { const el = document.getElementById(id); return el ? el.value : ""; }
     function isC(id) { const el = document.getElementById(id); return el ? el.checked : false; }
 
@@ -150,6 +188,10 @@
         const target = document.getElementById(targetId);
         if (target) target.style.display = sel.value === "Other" ? "block" : "none";
         generatePrompt();
+    }
+
+    function closeModal() {
+        document.getElementById('promoModal').style.display = 'none';
     }
 
     function updateConsultantFrameworks() {
@@ -226,7 +268,7 @@
                 </div>
                 <div class="row-group">
                     <input type="checkbox" id="camMoveCheck" onchange="toggleField('camMoveCheck', 'camMoveInput')">
-                    <label>Include Camera Movement?</label>
+                    <label>Camera Movement (e.g. Pan, Zoom)?</label>
                 </div>
                 <div id="camMoveInput" class="hidden-field">
                     <input type="text" id="camMoveText" placeholder="e.g. Slow Dolly Zoom into subject..." oninput="generatePrompt()">
@@ -365,7 +407,7 @@
                     <input type="text" id="mcFrameworkOther" class="hidden-field" placeholder="Custom Framework..." oninput="generatePrompt()">
                 </div>
                 <h3>Context & Expert Data</h3>
-                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="Describe the core business problem..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="Describe core business challenge..." oninput="generatePrompt()"></textarea></div>
                 <div id="mcConditionalFields"></div>
                 <h3>Task Customization</h3>
                 <div class="row-group">
@@ -550,7 +592,7 @@
                         <option value="Playful & Irreverent">Playful & Irreverent</option>
                         <option value="Other">Other</option>
                     </select>
-                    <input type="text" id="brandToneOther" class="hidden-field" placeholder="Tone..." oninput="generatePrompt()">
+                    <input type="text" id="brandToneOther" class="hidden-field" placeholder="Custom tone..." oninput="generatePrompt()">
                 </div>
                 <div class="checkbox-grid">
                     <div class="checkbox-item"><input type="checkbox" id="checkUSP" onchange="toggleField('checkUSP', 'inputUSP')"><label>Include USP/UVP</label></div>
@@ -620,7 +662,7 @@
                 <h3>The Fundamentals</h3>
                 <div class="field-group"><label>Acting Role</label><input type="text" id="customRole" placeholder="Role..." oninput="generatePrompt()"></div>
                 <div class="field-group"><label>Context</label><textarea id="customContext" rows="3" placeholder="Describe situation..." oninput="generatePrompt()"></textarea></div>
-                <div class="field-group"><label>Task</label><textarea id="customTask" rows="3" placeholder="Action..." oninput="generatePrompt()"></textarea></div>`;
+                <div class="field-group"><label>Task</label><textarea id="customTask" rows="3" placeholder="Specific action..." oninput="generatePrompt()"></textarea></div>`;
         }
         generatePrompt();
     }
@@ -642,7 +684,7 @@
             const light = gS('lighting', 'lightingOther');
             const col = gS('color', 'colorOther');
             const time = gS('timeOfDay', 'timeOther');
-            p = `Act as a world-class Film Director.\n\nVISUAL SPECS:\n- Shot: ${gS('shotType', 'shotTypeOther')}\n- Movement: ${isC('camMoveCheck') ? getV('camMoveText') : "Static"}\n- Style: ${gS('aesthetic', 'aestheticOther')}\n\nSUBJECT & SETTING:\n- Action: ${getV('subjectAction') || "[Describe Action]"}\n- Setting: ${gS('setting', 'settingOther')}\n- Time/Atmosphere: ${time}\n- Background: ${getV('bgDetails')}\n\nLIGHT & COLOR:\n- Lighting Mood: ${light}\n- Color Palette: ${col}`;
+            p = `Act as a world-class Film Director.\n\nVISUAL SPECS:\n- View: ${gS('shotType', 'shotTypeOther')}\n- Movement: ${isC('camMoveCheck') ? getV('camMoveText') : "Static"}\n- Style: ${gS('aesthetic', 'aestheticOther')}\n\nSUBJECT & SETTING:\n- Action: ${getV('subjectAction') || "[Describe Action]"}\n- Setting: ${gS('setting', 'settingOther')}\n- Time/Atmosphere: ${time}\n\nLIGHT & COLOR:\n- Lighting Mood: ${light}\n- Color Palette: ${col}`;
             if (isC('audioCheck')) p += `\n\nAUDIO:\n- Sound Ambience: ${getV('ambient')}`;
             let negs = []; document.querySelectorAll('.neg-check:checked').forEach(c => negs.push(c.value)); if (isC('negOtherCheck')) negs.push(getV('negOtherInput')); if (negs.length > 0) p += `\n\nNEGATIVE PROMPT: ${negs.join(', ')}`;
         } else if (role === "Management Consultant") {
@@ -656,15 +698,15 @@
             const taskInstruction = isC('checkCustomTask') ? getV('mcCustomTaskText') : (taskMap[obj] || "Provide strategic recommendations.");
             p = `Act as a Managing Partner at a top-tier global strategy consultancy.\n\nBUSINESS PROBLEM: \n${getV('mcContext') || "[No Context Provided]"}\n\nSTRATEGIC FOCUS:\n- Objective: ${obj}\n- Framework: ${frm}`;
             if (cond1) p += `\n- ${label1}: ${cond1}`; if (cond2) p += `\n- ${label2}: ${cond2}`;
-            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant (Mutually Exclusive, Collectively Exhaustive).`;
+            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant.`;
         } else if (role === "Talent Acquisition Specialist") {
             const obj = gS('taObjective', 'taObjectiveOther');
-            const taskMap = { "Create High-Impact Job Description": "Write a compelling job description.", "Draft Executive Outreach (Headhunting)": "Draft a persuasive outreach message.", "Generate Candidate Evaluation Rubric": "Design a structured evaluation scorecard." };
+            const taskMap = { "Create High-Impact Job Description": "Write a compelling, professional job description that attracts top-tier talent while filtering for the specified DNA.", "Draft Executive Outreach (Headhunting)": "Draft a persuasive, personalized outreach message for a headhunting campaign targeting high-level passive candidates.", "Generate Candidate Evaluation Rubric": "Design a structured candidate evaluation scorecard and behavioral interview rubric to ensure objective hiring." };
             p = `Act as an expert Talent Acquisition Specialist and Executive Recruiter.\n\nPOSITION DETAILS:\n- Title: ${getV('taJobTitle') || "[Title]"}\n- Seniority: ${getV('taSeniority')}\n- Industry: ${getV('taIndustry')}\n\nCONTEXT & DNA:\n- Qualifications: ${getV('taQuals')}\n- Culture: ${gS('taCulture', 'taCultureOther')}`;
             if (isC('checkComp')) p += `\n- Compensation: ${getV('inputComp')}`;
             if (isC('checkLoc')) p += `\n- Location: ${getV('inputLoc')}`;
             if (isC('checkExtra')) p += `\n- Additional Info: ${getV('inputExtra')}`;
-            p += `\n\nYOUR TASK:\n${taskMap[obj] || "Optimize talent strategy."}\n\nSTYLE SPECIFICATIONS:\n- Tone: ${gS('taTone', 'taToneOther')}\n- Standard: Top 1% Executive Recruitment standards.`;
+            p += `\n\nYOUR TASK:\n${taskMap[obj] || "Optimize talent acquisition strategy."}\n\nSTYLE SPECIFICATIONS:\n- Tone: ${gS('taTone', 'taToneOther')}\n- Standard: Top 1% Executive Recruitment standards.`;
         } else if (role === "Communication Coach") {
             const venue = gS('coachVenue', 'coachVenueOther');
             const goal = gS('coachGoal', 'coachGoalOther');
@@ -683,36 +725,37 @@
                 "Ad Campaign Creative Brief": "Develop a professional campaign brief for high performance."
             };
             p = `Act as a world-class Marketing Strategist and Brand Director from a top-tier global agency.\n\nSTRATEGIC MANDATE: ${mandate}\n\n`;
-            if (isC('checkAudDemo') || isC('checkAudGeo') || isC('checkAudPsy') || isC('checkAudPain') || isC('checkAudAware')) {
+            if (isC('checkAudDemo') || isC('checkAudGeo') || isC('checkAudPsy') || isC('checkAudPain') || isC('checkAudAware') || isC('checkAudOther')) {
                 p += `AUDIENCE PROFILE:\n`;
                 if (isC('checkAudDemo')) p += `- Demographics: ${getV('inputAudDemo')}\n`;
                 if (isC('checkAudGeo')) p += `- Geographic: ${getV('inputAudGeo')}\n`;
                 if (isC('checkAudPsy')) p += `- Psychographics: ${getV('inputAudPsy')}\n`;
                 if (isC('checkAudPain')) p += `- Pain Points: ${getV('inputAudPain')}\n`;
                 if (isC('checkAudAware')) p += `- Awareness Level: ${getV('selectAudAware')}\n`;
+                if (isC('checkAudOther')) p += `- Other Audience Info: ${getV('inputAudOther')}\n`;
                 p += `\n`;
             }
             p += `OFFERING DESCRIPTION:\n${getV('brandDesc')}\n`;
             if (isC('checkUSP')) p += `\nUSP/UVP CONTEXT:\n${getV('inputUSP')}\n`;
             if (isC('checkCompetitors')) p += `\nKEY COMPETITORS: ${getV('inputCompetitors')}\n`;
-            p += `\nYOUR TASK:\n${taskMap[mandate] || "Develop strategy."}\n\nDISTRIBUTION & TONE:\n- Primary Channel: ${gS('brandChannel', 'brandChannelOther')}\n- Tone: ${gS('brandTone', 'brandToneOther')}\n- Standards: Top 1% Global Marketing Agency Strategic Standards.`;
+            p += `\nYOUR TASK:\n${taskMap[mandate] || "Develop high-impact marketing strategy."}\n\nDISTRIBUTION & TONE:\n- Primary Channel: ${gS('brandChannel', 'brandChannelOther')}\n- Tone: ${gS('brandTone', 'brandToneOther')}\n- Standards: Top 1% Global Marketing Agency Strategic Standards.`;
         } else if (role === "Graphic Designer") {
             const obj = gS('designObj', 'designObjOther');
             const taskMap = {
-                "Brand Identity (Logo & Vision)": "Design a timeless, scalable brand mark and identity system.",
-                "Social Media Visual Assets": "Create high-engagement social visuals.",
-                "Presentation / Pitch Deck Design": "Design investor-grade presentation layouts.",
-                "Infographic (Data Visualization)": "Create a clear, impactful infographic that visualizes complex data.",
-                "Brochure & Multi-page Layout": "Design a professional multi-page brochure focused on flow and readability.",
-                "Print & Packaging Layout": "Design professional print-ready packaging or collateral layouts.",
-                "UI/UX Web Components": "Design clean, user-centric web interface components."
+                "Brand Identity (Logo & Vision)": "Design a timeless, scalable brand mark and comprehensive visual identity system.",
+                "Social Media Visual Assets": "Create high-engagement, scroll-stopping social visuals that align with brand guidelines.",
+                "Presentation / Pitch Deck Design": "Design a high-stakes, investor-grade presentation layout focused on visual hierarchy and clarity.",
+                "Infographic (Data Visualization)": "Create a clear, impactful infographic that visualizes complex data with professional aesthetic.",
+                "Brochure & Multi-page Layout": "Design a professional multi-page brochure focused on flow, readability, and information hierarchy.",
+                "Print & Packaging Layout": "Design professional print-ready packaging or collateral layouts with attention to typography and composition.",
+                "UI/UX Web Components": "Design clean, user-centric web interface components and layouts."
             };
             p = `Act as an elite Art Director and Lead Graphic Designer from a top-tier global design studio.\n\nPROJECT OBJECTIVE: ${obj}\nCONTEXT: ${getV('designContext')}\n\nVISUAL DIRECTION:\n- Style: ${gS('designStyle', 'designStyleOther')}\n- Typography: ${gS('designType', 'designTypeOther')}`;
             if (isC('checkColor')) p += `\n- Color Palette: ${getV('inputColor')}`;
             if (isC('checkIcons')) p += `\n- Imagery/Icons: ${getV('inputIcons')}`;
             if (isC('checkDims')) p += `\n- Dimensions: ${getV('inputDims')}`;
             if (isC('checkLogo')) p += `\n- NOTE: I have attached the logo to be used/referenced in this design.`;
-            p += `\n\nYOUR TASK:\n${taskMap[obj] || "Create designs."}\n\nSTANDARDS: High-end design studio quality with focus on visual hierarchy and brand alignment.`;
+            p += `\n\nYOUR TASK:\n${taskMap[obj] || "Create high-fidelity design concepts."}\n\nSTANDARDS: High-end design studio quality with focus on visual hierarchy, composition, and brand alignment.`;
         }
         document.getElementById('output').innerText = p;
     }
@@ -724,10 +767,22 @@
         textArea.value = text;
         textArea.select();
         document.execCommand('copy');
+        
         btn.innerText = "COPIED!";
         btn.style.backgroundColor = "#FFFFFF";
-        setTimeout(() => { btn.innerText = "COPY TO CLIPBOARD"; btn.style.backgroundColor = "var(--accent)"; }, 2000);
+
+        // Logic for the Pop-up
+        copyCount++;
+        if (copyCount === 2) {
+            document.getElementById('promoModal').style.display = 'flex';
+        }
+
+        setTimeout(() => { 
+            btn.innerText = "COPY TO CLIPBOARD"; 
+            btn.style.backgroundColor = "var(--accent)"; 
+        }, 2000);
     }
+
     window.onload = renderRoleUI;
 </script>
 </body>
