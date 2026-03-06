@@ -207,8 +207,8 @@
 
     function scrollToMailingList() {
         closeModal('newsModal');
-        // This tells the main Thinkific page to scroll to the bottom
-        window.parent.scrollTo({ top: window.parent.document.body.scrollHeight, behavior: 'smooth' });
+        // Part 1 FIX: Send signal to the parent page (Thinkific)
+        window.parent.postMessage('scroll-to-bottom', '*');
     }
 
     function updateConsultantFrameworks() {
@@ -715,7 +715,7 @@
             const taskInstruction = isC('checkCustomTask') ? getV('mcCustomTaskText') : (taskMap[obj] || "Provide strategic recommendations.");
             p = `Act as a Managing Partner at a top-tier global strategy consultancy.\n\nBUSINESS PROBLEM: \n${getV('mcContext') || "[No Context Provided]"}\n\nSTRATEGIC FOCUS:\n- Objective: ${obj}\n- Framework: ${frm}`;
             if (cond1) p += `\n- ${label1}: ${cond1}`; if (cond2) p += `\n- ${label2}: ${cond2}`;
-            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant (Mutually Exclusive, Collectively Exhaustive).`;
+            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant.`;
         } else if (role === "Talent Acquisition Specialist") {
             const obj = gS('taObjective', 'taObjectiveOther');
             const taskMap = { "Create High-Impact Job Description": "Write a compelling, professional job description that attracts top-tier talent while filtering for the specified DNA.", "Draft Executive Outreach (Headhunting)": "Draft a persuasive, personalized outreach message for a headhunting campaign targeting high-level passive candidates.", "Generate Candidate Evaluation Rubric": "Design a structured candidate evaluation scorecard and behavioral interview rubric to ensure objective hiring." };
@@ -788,7 +788,6 @@
         btn.innerText = "COPIED!";
         btn.style.backgroundColor = "#FFFFFF";
 
-        // Click Tracking Logic
         copyCount++;
         if (copyCount === 2) {
             document.getElementById('courseModal').style.display = 'flex';
