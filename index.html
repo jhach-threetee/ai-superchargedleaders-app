@@ -10,7 +10,7 @@
             --navy: #0C2867;
             --accent: #F4C744;
             --white: #FFFFFF;
-            --overlay: rgba(12, 40, 103, 0.9);
+            --overlay: rgba(12, 40, 103, 0.95);
         }
         
         * { box-sizing: border-box; }
@@ -109,7 +109,7 @@
             background: var(--accent); color: var(--navy); padding: 18px 40px;
             text-decoration: none; font-weight: 900; border-radius: 6px;
             display: inline-block; transition: 0.3s; font-size: 1rem;
-            text-transform: uppercase;
+            text-transform: uppercase; cursor: pointer; border: none;
         }
         .modal-btn:hover { background: var(--white); transform: scale(1.05); }
         .close-modal {
@@ -123,7 +123,7 @@
             background: rgba(255,255,255,0.2); border-radius: 10px; 
         }
 
-        /* Mobile Fix: Split screen 50/50 */
+        /* Mobile Fix */
         @media (max-width: 800px) {
             .app-wrapper { flex-direction: column; overflow: hidden; height: 100vh; padding: 10px; gap: 10px; }
             .input-section { flex: 1; height: 50%; min-width: 100%; padding-right: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -161,12 +161,21 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="promoModal">
+<div class="modal-overlay" id="courseModal">
     <div class="modal-box">
-        <span class="close-modal" onclick="closeModal()">✕</span>
+        <span class="close-modal" onclick="closeModal('courseModal')">✕</span>
         <h2>Elevate Your Strategy</h2>
         <p>You've got the prompt. Now get the Blueprint. Join the <strong>AI Supercharged Leaders Course</strong> for $249 and move from 'using tools' to strategically leading an AI Supercharged organization.</p>
         <a href="https://www.aisuperchargedleaders.com/products/courses/aisuperchargedleaders" target="_top" class="modal-btn">Enroll Now</a>
+    </div>
+</div>
+
+<div class="modal-overlay" id="newsModal">
+    <div class="modal-box">
+        <span class="close-modal" onclick="closeModal('newsModal')">✕</span>
+        <h2>Stay Ahead of the Curve</h2>
+        <p>Get weekly executive AI insights and advanced prompting strategies delivered to your inbox. Join our community of AI-Supercharged Leaders.</p>
+        <button class="modal-btn" onclick="scrollToMailingList()">Join the Mailing List</button>
     </div>
 </div>
 
@@ -192,8 +201,14 @@
         generatePrompt();
     }
 
-    function closeModal() {
-        document.getElementById('promoModal').style.display = 'none';
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    function scrollToMailingList() {
+        closeModal('newsModal');
+        // This tells the main Thinkific page to scroll to the bottom
+        window.parent.scrollTo({ top: window.parent.document.body.scrollHeight, behavior: 'smooth' });
     }
 
     function updateConsultantFrameworks() {
@@ -259,7 +274,7 @@
                     <label>View / Distance</label>
                     <select id="shotType" onchange="toggleSelectOther('shotType', 'shotTypeOther')">
                         <option value="Wide Shot (Full context/landscape)">Wide View (The Big Picture)</option>
-                        <option value="Medium Shot (Natural human interaction)">Standard View (Balanced)</option>
+                        <option value="Medium Shot (Standard human interaction)">Standard View (Balanced)</option>
                         <option value="Close-up (Detail and emotional impact)">Close-up (Detailed Focus)</option>
                         <option value="Low Angle (Conveys power and authority)">Low Angle (Powerful/Dominant)</option>
                         <option value="High Angle (Conveys scale or vulnerability)">High Angle (Vulnerable/Overview)</option>
@@ -279,7 +294,7 @@
                 <h3>Subject & Environment</h3>
                 <div class="field-group">
                     <label>Subject Focus</label>
-                    <textarea id="subjectAction" rows="3" placeholder="CEO - Standing at window - Looking determined..." oninput="generatePrompt()"></textarea>
+                    <textarea id="subjectAction" rows="3" placeholder="CEO - Standing at window..." oninput="generatePrompt()"></textarea>
                 </div>
                 <div class="field-group">
                     <label>Primary Setting</label>
@@ -409,7 +424,7 @@
                     <input type="text" id="mcFrameworkOther" class="hidden-field" placeholder="Custom Framework..." oninput="generatePrompt()">
                 </div>
                 <h3>Context & Expert Data</h3>
-                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="Describe the core business problem..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="Describe core business challenge..." oninput="generatePrompt()"></textarea></div>
                 <div id="mcConditionalFields"></div>
                 <h3>Task Customization</h3>
                 <div class="row-group">
@@ -700,7 +715,7 @@
             const taskInstruction = isC('checkCustomTask') ? getV('mcCustomTaskText') : (taskMap[obj] || "Provide strategic recommendations.");
             p = `Act as a Managing Partner at a top-tier global strategy consultancy.\n\nBUSINESS PROBLEM: \n${getV('mcContext') || "[No Context Provided]"}\n\nSTRATEGIC FOCUS:\n- Objective: ${obj}\n- Framework: ${frm}`;
             if (cond1) p += `\n- ${label1}: ${cond1}`; if (cond2) p += `\n- ${label2}: ${cond2}`;
-            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant.`;
+            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant (Mutually Exclusive, Collectively Exhaustive).`;
         } else if (role === "Talent Acquisition Specialist") {
             const obj = gS('taObjective', 'taObjectiveOther');
             const taskMap = { "Create High-Impact Job Description": "Write a compelling, professional job description that attracts top-tier talent while filtering for the specified DNA.", "Draft Executive Outreach (Headhunting)": "Draft a persuasive, personalized outreach message for a headhunting campaign targeting high-level passive candidates.", "Generate Candidate Evaluation Rubric": "Design a structured candidate evaluation scorecard and behavioral interview rubric to ensure objective hiring." };
@@ -773,9 +788,12 @@
         btn.innerText = "COPIED!";
         btn.style.backgroundColor = "#FFFFFF";
 
+        // Click Tracking Logic
         copyCount++;
         if (copyCount === 2) {
-            document.getElementById('promoModal').style.display = 'flex';
+            document.getElementById('courseModal').style.display = 'flex';
+        } else if (copyCount === 5) {
+            document.getElementById('newsModal').style.display = 'flex';
         }
 
         setTimeout(() => { 
