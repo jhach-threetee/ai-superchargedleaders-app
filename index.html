@@ -279,7 +279,7 @@
                 <h3>Subject & Environment</h3>
                 <div class="field-group">
                     <label>Subject Focus</label>
-                    <textarea id="subjectAction" rows="3" placeholder="Who/What is in the scene and what are they doing?..." oninput="generatePrompt()"></textarea>
+                    <textarea id="subjectAction" rows="3" placeholder="CEO - Standing at window..." oninput="generatePrompt()"></textarea>
                 </div>
                 <div class="field-group">
                     <label>Primary Setting</label>
@@ -409,7 +409,7 @@
                     <input type="text" id="mcFrameworkOther" class="hidden-field" placeholder="Custom Framework..." oninput="generatePrompt()">
                 </div>
                 <h3>Context & Expert Data</h3>
-                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="Describe core business challenge..." oninput="generatePrompt()"></textarea></div>
+                <div class="field-group"><label>Business Problem</label><textarea id="mcContext" rows="4" placeholder="Describe the core business problem..." oninput="generatePrompt()"></textarea></div>
                 <div id="mcConditionalFields"></div>
                 <h3>Task Customization</h3>
                 <div class="row-group">
@@ -459,6 +459,15 @@
                     </select>
                     <input type="text" id="taObjectiveOther" class="hidden-field" placeholder="Custom mandate..." oninput="generatePrompt()">
                 </div>
+                <h3>Context & DNA</h3>
+                <div class="checkbox-grid">
+                    <div class="checkbox-item"><input type="checkbox" id="checkQuals" onchange="toggleField('checkQuals', 'taQuals')"><label>Qualifications</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="checkCulture" onchange="toggleField('checkCulture', 'taCulture')"><label>Culture</label></div>
+                </div>
+                <textarea id="taQuals" class="hidden-field" rows="3" placeholder="Must-have expertise, track record..." oninput="generatePrompt()"></textarea>
+                <textarea id="taCulture" class="hidden-field" rows="2" placeholder="Describe company culture..." oninput="generatePrompt()"></textarea>
+
+                <h3>Add-ons & Style</h3>
                 <div class="checkbox-grid">
                     <div class="checkbox-item"><input type="checkbox" id="checkComp" onchange="toggleField('checkComp', 'inputComp')"><label>Compensation</label></div>
                     <div class="checkbox-item"><input type="checkbox" id="checkLoc" onchange="toggleField('checkLoc', 'inputLoc')"><label>Location</label></div>
@@ -467,8 +476,8 @@
                 <input type="text" id="inputComp" class="hidden-field" placeholder="$150k - $180k" oninput="generatePrompt()">
                 <input type="text" id="inputLoc" class="hidden-field" placeholder="Hybrid - NYC" oninput="generatePrompt()">
                 <textarea id="inputExtra" class="hidden-field" rows="2" placeholder="Extra info..." oninput="generatePrompt()"></textarea>
-                <h3>Output Style</h3>
-                <div class="field-group">
+                
+                <div class="field-group" style="margin-top:10px;">
                     <label>Recruitment Tone</label>
                     <select id="taTone" onchange="toggleSelectOther('taTone', 'taToneOther')">
                         <option value="Professional & Authoritative">Professional & Authoritative</option>
@@ -681,7 +690,10 @@
         if (role === "Other") {
             p = `Act as an expert ${getV('customRole') || "[Role]"}.\n\nBACKGROUND: ${getV('customContext')}\n\nYOUR TASK: ${getV('customTask')}`;
         } else if (role === "Translator") {
-            p = `Act as a master Localization Expert and Translator. Translate from ${getV('sourceLang') || "[Source]"} to ${getV('targetLang') || "[Target]"}.\n\nSPECIFICATIONS:\n- Tone: ${gS('transTone', 'transToneOther')}\n- Material Type: ${gS('transMaterial', 'transMaterialOther')}\n- Context: ${getV('transContext')}\n\nSOURCE TEXT:\n"""\n${getV('transSource')}\n"""`;
+            p = `Act as a master Localization Expert and Translator. Translate from ${getV('sourceLang') || "[Source]"} to ${getV('targetLang') || "[Target]"}.\n\nSPECIFICATIONS:\n- Tone: ${gS('transTone', 'transToneOther')}\n- Material Type: ${gS('transMaterial', 'transMaterialOther')}\n- Context: ${getV('transContext')}`;
+            if (isC('checkNuance')) p += `\n\nINSTRUCTION: Provide a brief Cultural Nuance Report after translation.`;
+            if (isC('checkProtect')) p += `\n\nPROTECTED TERMS (DO NOT TRANSLATE): ${getV('inputProtect')}`;
+            p += `\n\nSOURCE TEXT:\n"""\n${getV('transSource')}\n"""`;
         } else if (role === "Film Director") {
             const light = gS('lighting', 'lightingOther');
             const col = gS('color', 'colorOther');
@@ -700,20 +712,29 @@
             const taskInstruction = isC('checkCustomTask') ? getV('mcCustomTaskText') : (taskMap[obj] || "Provide strategic recommendations.");
             p = `Act as a Managing Partner at a top-tier global strategy consultancy.\n\nBUSINESS PROBLEM: \n${getV('mcContext') || "[No Context Provided]"}\n\nSTRATEGIC FOCUS:\n- Objective: ${obj}\n- Framework: ${frm}`;
             if (cond1) p += `\n- ${label1}: ${cond1}`; if (cond2) p += `\n- ${label2}: ${cond2}`;
-            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant.`;
+            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant (Mutually Exclusive, Collectively Exhaustive).`;
         } else if (role === "Talent Acquisition Specialist") {
             const obj = gS('taObjective', 'taObjectiveOther');
             const taskMap = { "Create High-Impact Job Description": "Write a compelling, professional job description that attracts top-tier talent while filtering for the specified DNA.", "Draft Executive Outreach (Headhunting)": "Draft a persuasive, personalized outreach message for a headhunting campaign targeting high-level passive candidates.", "Generate Candidate Evaluation Rubric": "Design a structured candidate evaluation scorecard and behavioral interview rubric to ensure objective hiring." };
-            p = `Act as an expert Talent Acquisition Specialist and Executive Recruiter.\n\nPOSITION DETAILS:\n- Title: ${getV('taJobTitle') || "[Title]"}\n- Seniority: ${getV('taSeniority')}\n- Industry: ${getV('taIndustry')}\n\nCONTEXT & DNA:\n- Qualifications: ${getV('taQuals')}\n- Culture: ${gS('taCulture', 'taCultureOther')}`;
-            if (isC('checkComp')) p += `\n- Compensation: ${getV('inputComp')}`;
-            if (isC('checkLoc')) p += `\n- Location: ${getV('inputLoc')}`;
-            if (isC('checkExtra')) p += `\n- Additional Info: ${getV('inputExtra')}`;
+            p = `Act as an expert Talent Acquisition Specialist and Executive Recruiter.\n\nPOSITION DETAILS:\n- Title: ${getV('taJobTitle') || "[Title]"}\n- Seniority: ${getV('taSeniority')}\n- Industry: ${getV('taIndustry')}`;
+            if (isC('checkQuals') || isC('checkCulture')) {
+                p += `\n\nCONTEXT & DNA:`;
+                if (isC('checkQuals')) p += `\n- Qualifications: ${getV('taQuals')}`;
+                if (isC('checkCulture')) p += `\n- Culture: ${getV('taCulture')}`;
+            }
+            if (isC('checkComp') || isC('checkLoc') || isC('checkExtra')) {
+                p += `\n\nADDITIONAL DETAILS:`;
+                if (isC('checkComp')) p += `\n- Compensation: ${getV('inputComp')}`;
+                if (isC('checkLoc')) p += `\n- Location: ${getV('inputLoc')}`;
+                if (isC('checkExtra')) p += `\n- Extra Info: ${getV('inputExtra')}`;
+            }
             p += `\n\nYOUR TASK:\n${taskMap[obj] || "Optimize talent acquisition strategy."}\n\nSTYLE SPECIFICATIONS:\n- Tone: ${gS('taTone', 'taToneOther')}\n- Standard: Top 1% Executive Recruitment standards.`;
         } else if (role === "Communication Coach") {
             const venue = gS('coachVenue', 'coachVenueOther');
             const goal = gS('coachGoal', 'coachGoalOther');
             let focusItems = []; document.querySelectorAll('.coach-focus:checked').forEach(c => focusItems.push(c.value));
             p = `Act as an elite Communication Coach and EQ Expert specializing in Executive Influence.\n\nVENUE/SETTING: ${venue}\nSTRATEGIC GOAL: ${goal}\nTARGET AUDIENCE: ${getV('coachAudience')}\n\nSITUATION & CONTEXT:\n${getV('coachSituation')}`;
+            if (isC('coachExtraCheck')) p += `\n\nADDITIONAL NUANCES:\n${getV('coachExtraInput')}`;
             p += `\n\nYOUR TASK:\nProvide high-level coaching on how to handle this interaction with a ${gS('coachTone', 'coachToneOther')} tone.`;
             if (focusItems.length > 0) p += `\n\nCOACHING FOCUS AREAS:\n- ${focusItems.join('\n- ')}`;
         } else if (role === "Brand/Marketing Specialist") {
@@ -773,7 +794,7 @@
         btn.innerText = "COPIED!";
         btn.style.backgroundColor = "#FFFFFF";
 
-        // Click Tracking Logic
+        // Logic for the Pop-up
         copyCount++;
         if (copyCount === 2) {
             document.getElementById('promoModal').style.display = 'flex';
