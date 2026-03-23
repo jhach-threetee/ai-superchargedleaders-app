@@ -382,14 +382,16 @@
                     </select>
                     <input type="text" id="transMaterialOther" class="hidden-field" placeholder="Specify material..." oninput="generatePrompt()">
                 </div>
-                <h3>Context & Nuance</h3>
+                <h3>Context & Terminology</h3>
                 <div class="field-group"><label>Usage Context</label><textarea id="transContext" rows="3" placeholder="Keynote speech, negotiation..." oninput="generatePrompt()"></textarea></div>
                 <div class="checkbox-grid">
-                    <div class="checkbox-item"><input type="checkbox" id="checkNuance" onchange="generatePrompt()"><label>Include Nuance Report</label></div>
                     <div class="checkbox-item"><input type="checkbox" id="checkProtect" onchange="toggleField('checkProtect', 'inputProtect')"><label>Terminology Protection</label></div>
                 </div>
                 <input type="text" id="inputProtect" class="hidden-field" placeholder="Terms to never translate..." oninput="generatePrompt()">
                 <h3>Source Text</h3>
+                <div class="checkbox-grid">
+                    <div class="checkbox-item"><input type="checkbox" id="checkAttachDoc" onchange="generatePrompt()"><label>Attached Document</label></div>
+                </div>
                 <div class="field-group"><textarea id="transSource" rows="6" placeholder="Paste your text here..." oninput="generatePrompt()"></textarea></div>`;
         } else if (role === "Management Consultant") {
             container.innerHTML = `
@@ -690,10 +692,18 @@
         if (role === "Other") {
             p = `Act as an expert ${getV('customRole') || "[Role]"}.\n\nBACKGROUND: ${getV('customContext')}\n\nYOUR TASK: ${getV('customTask')}`;
         } else if (role === "Translator") {
-            p = `Act as a master Localization Expert and Translator. Translate from ${getV('sourceLang') || "[Source]"} to ${getV('targetLang') || "[Target]"}.\n\nSPECIFICATIONS:\n- Tone: ${gS('transTone', 'transToneOther')}\n- Material Type: ${gS('transMaterial', 'transMaterialOther')}\n- Context: ${getV('transContext')}`;
-            if (isC('checkNuance')) p += `\n\nINSTRUCTION: Provide a brief Cultural Nuance Report after translation.`;
+            p = `Act as a master Localization Expert and Translator. Translate from ${getV('sourceLang') || "[Source]"} to ${getV('targetLang') || "[Target]"}.\n\nSPECIFICATIONS:\n- Tone: ${gS('transTone', 'transToneOther')}\n- Material Type: ${gS('transMaterial', 'transMaterialOther')}`;
+            const transContext = getV('transContext');
+            if (transContext) {
+                p += `\n- Context: ${transContext}`;
+            }
             if (isC('checkProtect')) p += `\n\nPROTECTED TERMS (DO NOT TRANSLATE): ${getV('inputProtect')}`;
-            p += `\n\nSOURCE TEXT:\n"""\n${getV('transSource')}\n"""`;
+            
+            if (isC('checkAttachDoc')) {
+                p += `\n\nSOURCE TEXT:\nPlease translate the attached document.`;
+            } else {
+                p += `\n\nSOURCE TEXT:\n"""\n${getV('transSource')}\n"""`;
+            }
         } else if (role === "Film Director") {
             const light = gS('lighting', 'lightingOther');
             const col = gS('color', 'colorOther');
@@ -712,7 +722,7 @@
             const taskInstruction = isC('checkCustomTask') ? getV('mcCustomTaskText') : (taskMap[obj] || "Provide strategic recommendations.");
             p = `Act as a Managing Partner at a top-tier global strategy consultancy.\n\nBUSINESS PROBLEM: \n${getV('mcContext') || "[No Context Provided]"}\n\nSTRATEGIC FOCUS:\n- Objective: ${obj}\n- Framework: ${frm}`;
             if (cond1) p += `\n- ${label1}: ${cond1}`; if (cond2) p += `\n- ${label2}: ${cond2}`;
-            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant (Mutually Exclusive, Collectively Exhaustive).`;
+            p += `\n\nYOUR TASK:\n${taskInstruction}\n\nOUTPUT FORMAT:\n- Deliverable: ${deliver}\n- Style: High-impact, executive tone.\n- Logic: MECE-compliant.`;
         } else if (role === "Talent Acquisition Specialist") {
             const obj = gS('taObjective', 'taObjectiveOther');
             const taskMap = { "Create High-Impact Job Description": "Write a compelling, professional job description that attracts top-tier talent while filtering for the specified DNA.", "Draft Executive Outreach (Headhunting)": "Draft a persuasive, personalized outreach message for a headhunting campaign targeting high-level passive candidates.", "Generate Candidate Evaluation Rubric": "Design a structured candidate evaluation scorecard and behavioral interview rubric to ensure objective hiring." };
@@ -794,7 +804,7 @@
         btn.innerText = "COPIED!";
         btn.style.backgroundColor = "#FFFFFF";
 
-        // Logic for the Pop-up
+        // Logic for the Pop-up (Only on click #2)
         copyCount++;
         if (copyCount === 2) {
             document.getElementById('promoModal').style.display = 'flex';
